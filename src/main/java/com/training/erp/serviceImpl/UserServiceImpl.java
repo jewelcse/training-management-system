@@ -1,9 +1,11 @@
 package com.training.erp.serviceImpl;
 
 import com.training.erp.entity.*;
+import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserUpdateRequest;
+import com.training.erp.model.response.RegisterResponse;
 import com.training.erp.repository.*;
 import com.training.erp.service.UserService;
 import com.training.erp.util.EmailService;
@@ -12,6 +14,7 @@ import com.training.erp.util.UtilProperties;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +44,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private TrainerRepository trainerRepository;
     @Autowired
-    private CourseRepository courseRepository;
+    private BCryptPasswordEncoder encoder;
     @Autowired
     EmailService emailService;
 
@@ -66,22 +69,56 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void save(User user, RegisterRequest request, boolean isTrainee) throws MessagingException, UnsupportedEncodingException {
-        if (isTrainee){
-            Trainee trainee = new Trainee();
-            trainee.setUser(user);
-            trainee.setFirstName(request.getFirst_name());
-            trainee.setLastName(request.getLast_name());
+    public RegisterResponse save(RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+        // user
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setEnabled(false);
+        user.setPassword(encoder.encode(request.getPassword()));
+        String stringRole = request.getRole();
+        Set<Role> roles = new HashSet<>();
+        // response
+        RegisterResponse response = new RegisterResponse();
+        response.setFirstName(request.getFirst_name());
+        response.setLastName(request.getLast_name());
+        response.setEmail(request.getEmail());
+        response.setUsername(request.getUsername());
+        if (stringRole == null) {
+            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+            roles.add(defaultRole);
+            user.setRoles(roles);
+            user.setNonLocked(true);
+            response.setAccountLocked(false);
+            response.setAccountVerified(false);
             userRepository.save(user);
-            traineeRepository.save(trainee);
-        }else{
-            Trainer trainer = new Trainer();
-            trainer.setUser(user);
-            trainer.setFirstName(request.getFirst_name());
-            trainer.setLastName(request.getLast_name());
-            userRepository.save(user);
-            trainerRepository.save(trainer);
-
+            saveTrainee(request.getFirst_name(),request.getLast_name(),user);
+        } else {
+            switch (stringRole) {
+                case "ROLE_TRAINER":
+                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
+                    roles.add(trainerRole);
+                    user.setRoles(roles);
+                    user.setNonLocked(false);
+                    response.setAccountLocked(true);
+                    response.setAccountVerified(false);
+                    userRepository.save(user);
+                    saveTrainer(request.getFirst_name(),request.getLast_name(),user);
+                    break;
+                case "ROLE_TRAINEE":
+                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+                    roles.add(traineeRole);
+                    user.setRoles(roles);
+                    user.setNonLocked(true);
+                    response.setAccountLocked(false);
+                    response.setAccountVerified(false);
+                    userRepository.save(user);
+                    saveTrainee(request.getFirst_name(),request.getLast_name(),user);
+                    break;
+            }
         }
         String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
         UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
@@ -91,7 +128,11 @@ public class UserServiceImpl implements UserService {
         userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
         userVerificationCenterRepository.save(userVerificationCenter);
         emailService.sendVerificationEmail(user,randomCode);
+        return response;
     }
+
+
+
     @Override
     public List<User> getAllUser() {
         return userRepository.findAll();
@@ -231,5 +272,20 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    private Trainee saveTrainee(String firstName, String lastName, User user) {
+        Trainee trainee = new Trainee();
+        trainee.setFirstName(firstName);
+        trainee.setLastName(lastName);
+        trainee.setUser(user);
+        return traineeRepository.save(trainee);
+    }
+
+    private Trainer saveTrainer(String firstName, String lastName, User user){
+        Trainer trainer = new Trainer();
+        trainer.setFirstName(firstName);
+        trainer.setLastName(lastName);
+        trainer.setUser(user);
+        return trainerRepository.save(trainer);
+    }
 
 }

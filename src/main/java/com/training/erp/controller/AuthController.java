@@ -97,58 +97,8 @@ public class AuthController {
                     .badRequest()
                     .body(new MessageResponse(request.getEmail() + " is already in use!"));
         }
-        // Create a new User Object
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        // Encode the password before set it to the user setPassword() method
-        user.setPassword(encoder.encode(request.getPassword()));
-        // User need an email verification
-        // That's why setEnabled will be false
-        // After successfully email verification it will be true
-        user.setEnabled(false);
-        String stringRole = request.getRole();
-        Set<Role> roles = new HashSet<>();
-        // Set a pointer
-        boolean isTrainee = false;
-        // Check the inputted role is null or not
-        if (stringRole == null) {
-            // If it is null, we will assign a default role that is ROLE_TRAINEE
-            // Getting the role Object
-            Role userRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-            roles.add(userRole);
-            // Setting the account is true by default
-            user.setNonLocked(true);
-            isTrainee = true;
-        } else {
-            switch (stringRole) {
-                case "ROLE_TRAINER":
-                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
-                    roles.add(trainerRole);
-                    // Trainer needs to be verified by email and
-                    // Also needs to be activated by the admin
-                    // That's why by default setNonLocked is false
-                    // After activated by the admin it will be true
-                    user.setNonLocked(false);
-                    isTrainee = false;
-                    break;
-                case "ROLE_TRAINEE":
-                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+        userService.save(request);
 
-                    roles.add(traineeRole);
-                    // By default, all trainees account will be activated
-                    // They only needs to be verified only
-                    // That's why setNonLocked is true by default
-                    user.setNonLocked(true);
-                    isTrainee = true;
-                    break;
-            }
-        }
-        user.setRoles(roles);
-        userService.save(user, request, isTrainee);
         return ResponseEntity.ok(new MessageResponse("Registration Successfully completed, please check your mail to verify account!"));
     }
 

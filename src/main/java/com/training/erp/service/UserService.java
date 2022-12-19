@@ -1,9 +1,11 @@
 package com.training.erp.service;
 
 import com.training.erp.entity.*;
+import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserUpdateRequest;
+import com.training.erp.model.response.RegisterResponse;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
@@ -15,7 +17,7 @@ public interface UserService {
     Optional<User> findByEmail(String email);
     boolean existsByUsername(String userName);
     boolean existsByEmail(String email);
-    void save(User user, RegisterRequest request, boolean isTrainee) throws MessagingException, UnsupportedEncodingException;
+    RegisterResponse save(RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException;
     List<User> getAllUser();
     List<User> getAllUserByRole(ERole role);
     void deleteUserById(Long id);
