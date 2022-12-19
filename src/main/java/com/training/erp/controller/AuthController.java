@@ -29,6 +29,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -70,21 +71,15 @@ public class AuthController {
 
     // Login
     @PostMapping("/sign-in")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        // Get the authentication object by using the user credentials
+    public ResponseEntity<LoginResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        // Set the authentication object to the security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        // Generate the JWT token
         String jwt = jwtUtil.generateToken(authentication);
-        // Getting the userDetails
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        // Getting the roles
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-        // Send response with the LoginResponse Object(jwt, user details, email, roles)
         return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
@@ -92,13 +87,11 @@ public class AuthController {
     @PostMapping("/sign-up")
     public ResponseEntity<?> signup(@Valid @RequestBody RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
 
-        // Check the username is already exists or not
         if (userService.existsByUsername(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse(request.getUsername() + " already exist!"));
         }
-        // Check the email is already exists or not
         if (userService.existsByEmail(request.getEmail())) {
             return ResponseEntity
                     .badRequest()
