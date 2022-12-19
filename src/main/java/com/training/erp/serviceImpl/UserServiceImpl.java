@@ -2,7 +2,6 @@ package com.training.erp.serviceImpl;
 
 import com.training.erp.entity.*;
 import com.training.erp.exception.RoleNotFoundException;
-import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserUpdateRequest;
 import com.training.erp.model.response.RegisterResponse;
@@ -10,7 +9,6 @@ import com.training.erp.repository.*;
 import com.training.erp.service.UserService;
 import com.training.erp.util.EmailService;
 import com.training.erp.util.UtilMethods;
-import com.training.erp.util.UtilProperties;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -80,8 +78,8 @@ public class UserServiceImpl implements UserService {
         Set<Role> roles = new HashSet<>();
         // response
         RegisterResponse response = new RegisterResponse();
-        response.setFirstName(request.getFirst_name());
-        response.setLastName(request.getLast_name());
+        response.setFirstName(request.getFirstName());
+        response.setLastName(request.getLastName());
         response.setEmail(request.getEmail());
         response.setUsername(request.getUsername());
         if (stringRole == null) {
@@ -92,8 +90,9 @@ public class UserServiceImpl implements UserService {
             user.setNonLocked(true);
             response.setAccountLocked(false);
             response.setAccountVerified(false);
+            response.setProfileType("TRAINEE ACCOUNT");
             userRepository.save(user);
-            saveTrainee(request.getFirst_name(),request.getLast_name(),user);
+            saveTrainee(request.getFirstName(),request.getLastName(),user);
         } else {
             switch (stringRole) {
                 case "ROLE_TRAINER":
@@ -104,8 +103,9 @@ public class UserServiceImpl implements UserService {
                     user.setNonLocked(false);
                     response.setAccountLocked(true);
                     response.setAccountVerified(false);
+                    response.setProfileType("TRAINER ACCOUNT");
                     userRepository.save(user);
-                    saveTrainer(request.getFirst_name(),request.getLast_name(),user);
+                    saveTrainer(request.getFirstName(),request.getLastName(),user);
                     break;
                 case "ROLE_TRAINEE":
                     Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
@@ -115,19 +115,21 @@ public class UserServiceImpl implements UserService {
                     user.setNonLocked(true);
                     response.setAccountLocked(false);
                     response.setAccountVerified(false);
+                    response.setProfileType("TRAINEE ACCOUNT");
                     userRepository.save(user);
-                    saveTrainee(request.getFirst_name(),request.getLast_name(),user);
+                    saveTrainee(request.getFirstName(),request.getLastName(),user);
                     break;
             }
         }
-        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
-        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
-        userVerificationCenter.setUser(user);
-        userVerificationCenter.setVerificationCode(randomCode);
-        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
-        userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
-        userVerificationCenterRepository.save(userVerificationCenter);
-        emailService.sendVerificationEmail(user,randomCode);
+//        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
+//        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
+//        userVerificationCenter.setUser(user);
+//        userVerificationCenter.setVerificationCode(randomCode);
+//        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
+//        userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
+//        userVerificationCenterRepository.save(userVerificationCenter);
+//        emailService.sendVerificationEmail(user,randomCode);
+        System.out.println("response: "+response.toString());
         return response;
     }
 
@@ -189,11 +191,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void activateTrainerAccount(long trainerAccountId, User user) {
         user.setId(trainerAccountId);
-        if(user.isNonLocked()){
-            user.setNonLocked(false);
-        }else{
-            user.setNonLocked(true);
-        }
+        user.setNonLocked(!user.isNonLocked());
         userRepository.save(user);
     }
 

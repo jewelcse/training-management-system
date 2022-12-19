@@ -10,9 +10,9 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class RegisterRequest {
     @NotBlank
-    private String first_name;
+    private String firstName;
     @NotBlank
-    private String last_name;
+    private String lastName;
     @NotBlank
     private String username;
     @NotBlank

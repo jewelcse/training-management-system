@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
-    private Long id;
-    private String username;
-    private String email;
+    private final Long id;
+    private final String username;
+    private final String email;
     @JsonIgnore
-    private String password;
-    private boolean enabled;
-    private boolean nonLocked;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final String password;
+    private final boolean enabled;
+    private final boolean nonLocked;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String username, String email, String password,boolean enabled,boolean nonLocked, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;

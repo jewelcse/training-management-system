@@ -7,6 +7,7 @@ import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.*;
 import com.training.erp.model.response.LoginResponse;
 import com.training.erp.model.response.MessageResponse;
+import com.training.erp.model.response.RegisterResponse;
 import com.training.erp.model.response.UserProfileResponse;
 import com.training.erp.repository.RoleRepository;
 import com.training.erp.repository.UserVerificationCenterRepository;
@@ -24,6 +25,7 @@ import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,8 +58,6 @@ public class AuthController {
     private RoleRepository roleRepository;
     @Autowired
     private AuthenticationManager authenticationManager;
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -97,9 +97,8 @@ public class AuthController {
                     .badRequest()
                     .body(new MessageResponse(request.getEmail() + " is already in use!"));
         }
-        userService.save(request);
 
-        return ResponseEntity.ok(new MessageResponse("Registration Successfully completed, please check your mail to verify account!"));
+        return new ResponseEntity<>(userService.save(request), HttpStatus.CREATED);
     }
 
     // Add user
