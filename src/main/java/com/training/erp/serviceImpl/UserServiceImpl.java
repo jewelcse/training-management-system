@@ -85,35 +85,32 @@ public class UserServiceImpl implements UserService {
             Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
                     .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
             roles.add(defaultRole);
-            user.setRoles(roles);
             response.setAccountVerified(false);
             response.setProfileType("TRAINEE ACCOUNT");
-            userRepository.save(user);
         } else {
             switch (stringRole) {
                 case "ROLE_TRAINER":
                     Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
                     roles.add(trainerRole);
-                    user.setRoles(roles);
                     response.setAccountVerified(false);
                     response.setProfileType("TRAINER ACCOUNT");
-                    userRepository.save(user);
                     break;
                 case "ROLE_TRAINEE":
                     Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
                     roles.add(traineeRole);
-                    user.setRoles(roles);
                     response.setAccountVerified(false);
                     response.setProfileType("TRAINEE ACCOUNT");
-                    userRepository.save(user);
                     break;
             }
         }
-
-        System.out.println("response: "+ response);
+        user.setRoles(roles);
+        Profile profile = new Profile();
+        user.setUserProfile(profile);
+        userRepository.save(user);
         // sent verification mail
+        //todo: save profile while creating user account
         return response;
     }
 
@@ -182,7 +179,7 @@ public class UserServiceImpl implements UserService {
     }
     @Transactional
     @Override
-    public void updateUser(UserUpdateRequest userUpdateRequest) {
+    public User updateUser(UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userUpdateRequest.getId())
                 .orElseThrow(()-> new UsernameNotFoundException("user not found for id: "+userUpdateRequest.getId()));
         user.setId(user.getId());
@@ -192,7 +189,7 @@ public class UserServiceImpl implements UserService {
                         .orElseThrow(()-> new RuntimeException("Role not found for "+ userUpdateRequest.getRole()));
         roles.add(role);
         user.setRoles(roles);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -203,17 +200,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void activateTrainerAccount(long trainerAccountId, User user) {
-        user.setId(trainerAccountId);
+    public void activateDeactivateUserAccount(User user) {
+        user.setId(user.getId());
         user.setNonLocked(!user.isNonLocked());
-        userRepository.save(user);
-    }
-
-    @Transactional
-    @Override
-    public void deActivateUserAccount(long userId, User user) {
-        user.setId(userId);
-        user.setNonLocked(false);
         userRepository.save(user);
     }
 
@@ -223,15 +212,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyAccount(UserVerificationCenter verification) {
+    public UserVerificationCenter verifyAccount(UserVerificationCenter verification) {
         verification.getUser().setId(verification.getUser().getId());
         verification.getUser().setEnabled(true);
-        userVerificationCenterRepository.save(verification);
         userRepository.save(verification.getUser());
+        return userVerificationCenterRepository.save(verification);
     }
 
     @Override
-    public void resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException {
+    public UserVerificationCenter resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException {
         String code = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
         userVerificationCenter.setVerificationCode(code);
         userVerificationCenter.setMaxLimit(userVerificationCenter.getMaxLimit()-1);
@@ -239,6 +228,7 @@ public class UserServiceImpl implements UserService {
         userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
         userVerificationCenterRepository.save(userVerificationCenter);
         emailService.sendVerificationEmail(user,code);
+        return userVerificationCenter;
     }
 
 
@@ -248,13 +238,13 @@ public class UserServiceImpl implements UserService {
         return scheduleRepository.findAllByCourse(course);
     }
     @Override
-    public void resetPassword(User user) {
-        userRepository.save(user);
+    public User resetPassword(User user) {
+        return userRepository.save(user);
     }
 
     @Override
-    public void lockedUserAccount(User user) {
-        userRepository.save(user);
+    public User lockedUserAccount(User user) {
+        return userRepository.save(user);
     }
 
     private void sendEmail(){

@@ -2,7 +2,6 @@ package com.training.erp.service;
 
 import com.training.erp.entity.*;
 import com.training.erp.exception.RoleNotFoundException;
-import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserAddRequest;
 import com.training.erp.model.request.UserUpdateRequest;
@@ -25,14 +24,13 @@ public interface UserService {
     List<User> getAllUser();
     List<User> getAllUserByRole(ERole role);
     void deleteUserById(Long id);
-    void updateUser(UserUpdateRequest userUpdateRequest);
-    void activateTrainerAccount(long trainerAccountId,User user);
+    User updateUser(UserUpdateRequest userUpdateRequest);
+    void activateDeactivateUserAccount(User user);
     Optional<User> existsByUserId(long trainerAccountId);
-    void deActivateUserAccount(long userId, User user);
     Optional<User> findById(long userId);
-    void verifyAccount(UserVerificationCenter userVerificationCenter);
-    void resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException;
+    UserVerificationCenter verifyAccount(UserVerificationCenter userVerificationCenter);
+    UserVerificationCenter resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException;
     List<Schedule> getAllScheduleByCourse(Course course);
-    void resetPassword(User user);
-    void lockedUserAccount(User user);
+    User resetPassword(User user);
+    User lockedUserAccount(User user);
 }
