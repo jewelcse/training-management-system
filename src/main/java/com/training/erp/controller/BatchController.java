@@ -6,8 +6,6 @@ import com.training.erp.model.request.BatchRequestDto;
 import com.training.erp.model.request.UserAssignRequestDto;
 import com.training.erp.model.response.BatchFullProfileResponse;
 import com.training.erp.model.response.MessageResponse;
-import com.training.erp.repository.TraineeRepository;
-import com.training.erp.repository.TrainerRepository;
 import com.training.erp.service.BatchService;
 import com.training.erp.service.CourseService;
 import com.training.erp.service.UserService;
@@ -26,10 +24,6 @@ public class BatchController {
     private BatchService batchService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private TrainerRepository trainerRepository;
-    @Autowired
-    private TraineeRepository traineeRepository;
     @Autowired
     private CourseService courseService;
     // Create batch
@@ -67,8 +61,8 @@ public class BatchController {
         User user = userService
                 .findByUsername(principal.getName())
                 .orElseThrow(()->new UsernameNotFoundException("User not found"));
-        Trainer trainer = trainerRepository.findByUser(user);
-        return ResponseEntity.ok(batchService.getBatchesByTrainerId(trainer.getId()));
+
+        return ResponseEntity.ok(null);
     }
 
     // Get The batch full profile by batch ID
@@ -101,9 +95,7 @@ public class BatchController {
     public ResponseEntity<?> removeTrainersFromBatch(@PathVariable("batch-id") long batchId, @PathVariable("trainer-id") long trainerId) throws BatchNotFoundException, CourseNotFoundException, TrainerNotFoundException {
         Batch batch = batchService.getBatchById(batchId)
                 .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
-        Trainer trainer = trainerRepository.findById(trainerId)
-                        .orElseThrow(()-> new TrainerNotFoundException("Trainer Account Not found"));
-        batchService.removeTrainerFromBatch(batch,trainer);
+
         return ResponseEntity.ok("Trainer Removed Successfully");
     }
 
@@ -112,9 +104,7 @@ public class BatchController {
     public ResponseEntity<?> removeTraineesFromBatch(@PathVariable("batch-id") long batchId, @PathVariable("trainee-id") long traineeId) throws BatchNotFoundException, CourseNotFoundException, TrainerNotFoundException, TraineeNotFoundException {
         Batch batch = batchService.getBatchById(batchId)
                 .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
-        Trainee trainee = traineeRepository.findById(traineeId)
-                        .orElseThrow(()-> new TraineeNotFoundException("Trainee Account not found"));
-        batchService.removeTraineeFromBatch(batch,trainee);
+
         return ResponseEntity.ok("Trainee Removed Successfully");
     }
     @DeleteMapping("/batches/{batch-id}")
@@ -134,10 +124,7 @@ public class BatchController {
 
         Batch batch = batchService.getBatchById(batchId)
                 .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
-        Trainee trainee = userService.getTraineeById(traineeId)
-                .orElseThrow(()-> new TraineeNotFoundException("Trainee Profile Not found"));
 
-        batchService.assignTraineeToBatch(batch, trainee);
         return ResponseEntity.ok(new MessageResponse("Assigned Success"));
     }
 
@@ -146,10 +133,7 @@ public class BatchController {
 
         Batch batch = batchService.getBatchById(batchId)
                 .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
-        Trainer trainer = userService.getTrainerById(trainerId)
-                .orElseThrow(()-> new TrainerNotFoundException("Trainer Profile Not found"));
 
-        batchService.assignTrainerToBatch(batch, trainer);
         return ResponseEntity.ok(new MessageResponse("Assigned Success"));
     }
 

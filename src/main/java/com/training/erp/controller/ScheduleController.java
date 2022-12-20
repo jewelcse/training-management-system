@@ -3,7 +3,6 @@ package com.training.erp.controller;
 import com.training.erp.entity.Batch;
 import com.training.erp.entity.Course;
 import com.training.erp.entity.Schedule;
-import com.training.erp.entity.Trainer;
 import com.training.erp.exception.BatchNotFoundException;
 import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.model.request.ScheduleRequest;
@@ -39,7 +38,7 @@ public class ScheduleController {
         // Get the batch, course, and also trainer
         Batch batch = batchService.getBatchById(request.getBatch_id()).get();
         Course course = courseService.getCourseByCourseId(request.getCourse_id());
-        Trainer trainer = course.getTrainer();
+
 
         // Start_date will be greater than all the same batch's previous schedules end_date
         // Get the all schedules by course
@@ -52,9 +51,6 @@ public class ScheduleController {
         Schedule schedule = new Schedule();
         schedule.setTitle(request.getTopic());
         schedule.setDescription(request.getTopic_description());
-        schedule.setTrainer(trainer);
-        schedule.setCourse(course);
-        schedule.setBatch(batch);
         schedule.setStart(request.getStart_date());
         schedule.setEnd(request.getEnd_date());
 

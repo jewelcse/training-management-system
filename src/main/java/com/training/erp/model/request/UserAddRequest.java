@@ -13,8 +13,12 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserAddRequest {
-    private String first_name;
-    private String last_name;
+    @NotBlank
+    private String firstName;
+    @NotBlank
+    private String lastName;
+    @NotBlank
     private String email;
+    @NotBlank
     private String role;
 }

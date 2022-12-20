@@ -20,14 +20,6 @@ public class BatchServiceImpl implements BatchService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TraineeRepository traineeRepository;
-    @Autowired
-    private TrainerRepository trainerRepository;
-
-    @Autowired
-    private AssignmentRepository assignmentRepository;
-
-    @Autowired
     private CourseRepository courseRepository;
     @Override
     public void createNewBatch(BatchRequestDto request) {
@@ -52,19 +44,6 @@ public class BatchServiceImpl implements BatchService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(()-> new UserNotFoundException("User not found"));
 
-        if (user.getRoles().stream().anyMatch(role -> role.getName().toString().equals("ROLE_TRAINEE"))){
-            Trainee trainee = traineeRepository.findByUserId(user.getId());
-            trainee.setBatch(batch);
-            trainee.setId(trainee.getId());
-            traineeRepository.save(trainee);
-        }else if(user.getRoles().stream().anyMatch(role -> role.getName().toString().equals("ROLE_TRAINER"))){
-            Trainer trainer = trainerRepository.findByUserId(user.getId());
-            Set<Batch> batches = trainer.getBatches();
-            batches.add(batch);
-            trainer.setBatches(batches);
-            trainer.setId(trainer.getId());
-            trainerRepository.save(trainer);
-        }
     }
 
     @Override
@@ -72,16 +51,6 @@ public class BatchServiceImpl implements BatchService {
         return batchRepository.findById(batchId);
     }
 
-    @Override
-    public Batch getBatchByTrainee(Trainee trainee) throws BatchNotFoundException {
-        return batchRepository.findById(trainee.getBatch().getId())
-                .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
-    }
-
-    @Override
-    public List<Batch> getBatchesByTrainerId(Long trainerId) {
-        return batchRepository.findAllByTrainer(trainerId);
-    }
 
     @Override
     public boolean existsByBatchName(String batch_name) {
@@ -93,31 +62,16 @@ public class BatchServiceImpl implements BatchService {
         batchRepository.deleteById(batchId);
     }
 
-    @Override
-    public boolean existsById(long batchId) {
-        return batchRepository.existsById(batchId);
-    }
 
-    @Override
-    public void assignTraineeToBatch(Batch batch, Trainee trainee) throws BatchNotFoundException {
-        trainee.setBatch(batch);
-        traineeRepository.save(trainee);
-    }
 
-    @Override
-    public void assignTrainerToBatch(Batch batch, Trainer trainer) {
-        batch.getTrainers().add(trainer);
-        trainerRepository.save(trainer);
-    }
+
 
     @Override
     public BatchFullProfileResponse getBatchFullProfileByBatch(Batch batch) {
 
-        List<Course> courses = courseRepository.getAllCoursesByBatch(batch.getId());
-        List<Trainee> trainees = traineeRepository.findAllByBatch(batch);
-        List<Trainer> trainers = trainerRepository.getAllTrainersByBatch(batch.getId());
+        List<Course> courses = null;
 
-        return new BatchFullProfileResponse(batch.getBatchName(),courses,trainees,trainers);
+        return new BatchFullProfileResponse(batch.getBatchName(),courses);
     }
 
     @Override
@@ -130,18 +84,6 @@ public class BatchServiceImpl implements BatchService {
         batch.getCourses().remove(course);
         batchRepository.save(batch);
 
-    }
-
-    @Override
-    public void removeTrainerFromBatch(Batch batch, Trainer trainer) {
-        batch.getTrainers().remove(trainer);
-        batchRepository.save(batch);
-    }
-
-    @Override
-    public void removeTraineeFromBatch(Batch batch, Trainee trainee) {
-        trainee.setBatch(null);
-        traineeRepository.save(trainee);
     }
 
 }

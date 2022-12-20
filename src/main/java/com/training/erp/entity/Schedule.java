@@ -19,17 +19,11 @@ public class Schedule {
     private Long id;
     private String title;
     private String description;
-
-    @ManyToOne
-    private Trainer trainer;
-
-    @ManyToOne
-    private Course course;
-
-    @ManyToOne
-    private Batch batch;
-
     private Timestamp start;
     private Timestamp end;
+    @ManyToOne
+    private Course course;
+    @ManyToOne
+    private Batch batch;
 
 }

@@ -1,7 +1,5 @@
 package com.training.erp.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,21 +10,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "trainees")
-public class Trainee{
+@Table(name = "AssignmentSubmissions")
+public class AssignmentSubmission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstName;
-    private String lastName;
-
-    @JsonBackReference
     @ManyToOne
-    private Batch batch;
-    @JsonBackReference
-    @OneToOne
     private User user;
-
+    private String fileLocation;
+    private int obtainedMarks;
+    @ManyToOne
+    private Assignment assignment;
 
 }

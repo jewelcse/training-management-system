@@ -1,15 +1,14 @@
 package com.training.erp.controller;
 
 import com.training.erp.entity.Assignment;
-import com.training.erp.entity.Trainee;
-import com.training.erp.entity.TraineesAssignmentSubmission;
+import com.training.erp.entity.AssignmentSubmission;
 import com.training.erp.entity.User;
 import com.training.erp.exception.*;
 import com.training.erp.model.request.AssignmentRequestDto;
 import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.model.response.TraineeAssignmentResponse;
-import com.training.erp.repository.TraineesAssignmentSubmissionRepository;
+import com.training.erp.repository.AssignmentSubmissionRepository;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.service.UserService;
 import com.training.erp.util.FilesStorageService;
@@ -28,12 +27,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.Principal;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -46,7 +42,7 @@ AssignmentController {
     @Autowired
     private UserService userService;
     @Autowired
-    private TraineesAssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
+    private AssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
     @Value("${fileLink}")
     private String link;
     // Create new assignment
@@ -64,7 +60,7 @@ AssignmentController {
     // Get all assignments by trainer
     @Secured("ROLE_TRAINER")
     @GetMapping("/assignments/trainer")
-    public ResponseEntity<List<Assignment>> getAssignmentsByTrainer(Principal principal) {
+    public ResponseEntity<List<Assignment>> getAssignmentsByUser(Principal principal) {
         return ResponseEntity.ok(assignmentService.getAssignments(principal));
     }
     // Gets assignment by course ID
@@ -88,7 +84,7 @@ AssignmentController {
 
     // Get trainees single submission by assignment submission ID
     @GetMapping("/assignments/trainees/submissions/{submission-id}")
-    public ResponseEntity<TraineesAssignmentSubmission> getTraineesSubmissionBySubmissionId(@PathVariable("submission-id") long submissionId) throws TraineesAssignmentSubmissionNotFoundException {
+    public ResponseEntity<AssignmentSubmission> getUserSubmissionBySubmissionId(@PathVariable("submission-id") long submissionId) throws TraineesAssignmentSubmissionNotFoundException {
         return ResponseEntity.ok(assignmentService.getTraineesSubmissionBySubmissionId(submissionId));
     }
 
@@ -97,7 +93,7 @@ AssignmentController {
     // Trainer can evaluate the trainees' submission
     // Added marks for the submitted assignment
     @PostMapping("/assignments/trainees/submissions")
-    public ResponseEntity<?> updateTraineesSubmission(@RequestBody AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException {
+    public ResponseEntity<?> updateUserSubmission(@RequestBody AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException {
         assignmentService.updateSubmission(submission);
         return ResponseEntity.ok("Updated");
     }
@@ -111,7 +107,7 @@ AssignmentController {
 
     // Get all trainees submissions in a single list
     @GetMapping("/assignments/trainees")
-    public ResponseEntity<List<TraineesAssignmentSubmission>> getSubmissionsByTrainee(){
+    public ResponseEntity<List<AssignmentSubmission>> getSubmissionsByUser(){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username="";
         if (principal instanceof UserDetails) {
@@ -122,8 +118,8 @@ AssignmentController {
         User user = userService.findByUsername(username)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found for username "));
         // Find the trainee profile by user
-        Trainee trainee = userService.getTraineeProfile(user);
-        return ResponseEntity.ok(traineesAssignmentSubmissionRepository.findAllByTrainee(trainee));
+//        Trainee trainee = userService.getTraineeProfile(user);
+        return ResponseEntity.ok(null);
 
     }
     // Submit the assignment by trainee
@@ -137,12 +133,10 @@ AssignmentController {
         // Find the user by username
         User user = userService.findByUsername(username)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found for username "));
-        // Find the trainee profile by user
-        Trainee trainee = userService.getTraineeProfile(user);
-        // Find the assignment means either the assignment exists or not in the DB
+
         Assignment assignment = assignmentService.getAssignmentByAssignmentId(assignmentId);
         boolean doesSubmitted
-                = traineesAssignmentSubmissionRepository.existsByTraineeAndAssignment(trainee, assignment);
+                = traineesAssignmentSubmissionRepository.existsById(assignmentId);
         // Check the assignment is submitted or not
         if (doesSubmitted){
             return ResponseEntity
@@ -151,18 +145,17 @@ AssignmentController {
         }
         // If not then,
         // Create a new object of the submission entity
-        TraineesAssignmentSubmission traineesAssignmentSubmission
-                = new TraineesAssignmentSubmission();
+        AssignmentSubmission traineesAssignmentSubmission
+                = new AssignmentSubmission();
         String message = "";
         try {
             // Save the pdf/ image/ docs file to upload folder
             String filePath = filesStorageService.saveFile(file);
             message = "Submitted the Assignment successfully";
-            traineesAssignmentSubmission.setTrainee(trainee);
-            traineesAssignmentSubmission.setAssignment(assignment);
+           // traineesAssignmentSubmission.setFileLocation(assignment);
             traineesAssignmentSubmission.setObtainedMarks(0);
-            traineesAssignmentSubmission.setFilePath(link+filePath);
-            traineesAssignmentSubmission.setCourse(assignment.getCourse());
+            //traineesAssignmentSubmission.setFilePath(link+filePath);
+            //traineesAssignmentSubmission.setCourse(assignment.getCourse());
             traineesAssignmentSubmissionRepository.save(traineesAssignmentSubmission);
             return ResponseEntity.status(HttpStatus.OK).body(message);
         } catch (Exception e) {

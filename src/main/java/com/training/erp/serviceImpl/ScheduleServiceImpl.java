@@ -4,7 +4,6 @@ package com.training.erp.serviceImpl;
 import com.training.erp.entity.Batch;
 import com.training.erp.entity.Course;
 import com.training.erp.entity.Schedule;
-import com.training.erp.entity.Trainer;
 import com.training.erp.repository.ScheduleRepository;
 import com.training.erp.service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +24,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.findAll();
     }
 
-    @Override
-    public List<Schedule> getSchedulesByTrainerId(Trainer trainer) {
-        return scheduleRepository.findAllByTrainer(trainer);
-    }
 
     @Override
     public List<Schedule> getSchedulesByCourseAndBatch(Course course, Batch batch) {

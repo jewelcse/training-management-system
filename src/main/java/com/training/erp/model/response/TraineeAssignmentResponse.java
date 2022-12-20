@@ -1,7 +1,7 @@
 package com.training.erp.model.response;
 
 import com.training.erp.entity.Assignment;
-import com.training.erp.entity.TraineesAssignmentSubmission;
+import com.training.erp.entity.AssignmentSubmission;
 import lombok.*;
 
 import java.util.List;
@@ -12,5 +12,5 @@ import java.util.List;
 @Setter
 public class TraineeAssignmentResponse {
     private Assignment assignment;
-    private List<TraineesAssignmentSubmission> submissions;
+    private List<AssignmentSubmission> submissions;
 }

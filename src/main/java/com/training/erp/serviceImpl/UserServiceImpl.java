@@ -3,8 +3,10 @@ package com.training.erp.serviceImpl;
 import com.training.erp.entity.*;
 import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.model.request.RegisterRequest;
+import com.training.erp.model.request.UserAddRequest;
 import com.training.erp.model.request.UserUpdateRequest;
 import com.training.erp.model.response.RegisterResponse;
+import com.training.erp.model.response.UserAddResponse;
 import com.training.erp.repository.*;
 import com.training.erp.service.UserService;
 import com.training.erp.util.EmailService;
@@ -38,10 +40,6 @@ public class UserServiceImpl implements UserService {
     private UserVerificationCenterRepository userVerificationCenterRepository;
 
     @Autowired
-    private TraineeRepository traineeRepository;
-    @Autowired
-    private TrainerRepository trainerRepository;
-    @Autowired
     private BCryptPasswordEncoder encoder;
     @Autowired
     EmailService emailService;
@@ -73,6 +71,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setEnabled(false);
+        user.setNonLocked(true);
         user.setPassword(encoder.encode(request.getPassword()));
         String stringRole = request.getRole();
         Set<Role> roles = new HashSet<>();
@@ -87,12 +86,9 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
             roles.add(defaultRole);
             user.setRoles(roles);
-            user.setNonLocked(true);
-            response.setAccountLocked(false);
             response.setAccountVerified(false);
             response.setProfileType("TRAINEE ACCOUNT");
             userRepository.save(user);
-            saveTrainee(request.getFirstName(),request.getLastName(),user);
         } else {
             switch (stringRole) {
                 case "ROLE_TRAINER":
@@ -100,39 +96,76 @@ public class UserServiceImpl implements UserService {
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
                     roles.add(trainerRole);
                     user.setRoles(roles);
-                    user.setNonLocked(false);
-                    response.setAccountLocked(true);
                     response.setAccountVerified(false);
                     response.setProfileType("TRAINER ACCOUNT");
                     userRepository.save(user);
-                    saveTrainer(request.getFirstName(),request.getLastName(),user);
                     break;
                 case "ROLE_TRAINEE":
                     Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
                     roles.add(traineeRole);
                     user.setRoles(roles);
-                    user.setNonLocked(true);
-                    response.setAccountLocked(false);
                     response.setAccountVerified(false);
                     response.setProfileType("TRAINEE ACCOUNT");
                     userRepository.save(user);
-                    saveTrainee(request.getFirstName(),request.getLastName(),user);
                     break;
             }
         }
-//        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
-//        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
-//        userVerificationCenter.setUser(user);
-//        userVerificationCenter.setVerificationCode(randomCode);
-//        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
-//        userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
-//        userVerificationCenterRepository.save(userVerificationCenter);
-//        emailService.sendVerificationEmail(user,randomCode);
-        System.out.println("response: "+response.toString());
+
+        System.out.println("response: "+ response);
+        // sent verification mail
         return response;
     }
 
+    @Override
+    public UserAddResponse save(UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+        // generate random username and password
+        String randomUserPassword = RandomString.make(8);
+        String finalUsername = request.getFirstName().toLowerCase() + "@" + RandomString.make(4);
+
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setUsername(finalUsername);
+        user.setPassword(encoder.encode(randomUserPassword));
+        user.setNonLocked(true);
+        user.setEnabled(true);
+
+        String stringRole = request.getRole();
+        Set<Role> roles = new HashSet<>();
+
+        if (stringRole == null) {
+            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+            roles.add(defaultRole);
+            user.setRoles(roles);
+            userRepository.save(user);
+        } else {
+            switch (stringRole) {
+                case "ROLE_TRAINER":
+                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
+                    roles.add(trainerRole);
+                    user.setRoles(roles);
+                    userRepository.save(user);
+                    break;
+                case "ROLE_TRAINEE":
+                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+                    roles.add(traineeRole);
+                    user.setRoles(roles);
+                    userRepository.save(user);
+                    break;
+            }
+        }
+        UserAddResponse response = new UserAddResponse();
+        response.setFirstName(request.getFirstName());
+        response.setLastName(response.getLastName());
+        response.setEmail(request.getEmail());
+        response.setUsername(finalUsername);
+
+        // sent main with credentials
+        return response;
+    }
 
 
     @Override
@@ -166,26 +199,7 @@ public class UserServiceImpl implements UserService {
     public Optional<User> existsByUserId(long trainerAccountId) {
         return userRepository.findById(trainerAccountId);
     }
-    @Override
-    public void saveUserByAdmin(User user,String firstName,String lastName,boolean isTrainee, boolean isTrainer) {
-        if (isTrainee && !isTrainer){
-            Trainee trainee = new Trainee();
-            trainee.setFirstName(firstName);
-            trainee.setLastName(lastName);
-            trainee.setUser(user);
-            userRepository.save(user);
-            traineeRepository.save(trainee);
-        }else if (!isTrainee && isTrainer){
-            Trainer trainer = new Trainer();
-            trainer.setFirstName(firstName);
-            trainer.setLastName(lastName);
-            trainer.setUser(user);
-            userRepository.save(user);
-            trainerRepository.save(trainer);
-        }else{
-            userRepository.save(user);
-        }
-    }
+
 
     @Transactional
     @Override
@@ -227,35 +241,8 @@ public class UserServiceImpl implements UserService {
         emailService.sendVerificationEmail(user,code);
     }
 
-    @Override
-    public Trainer getTrainerProfile(User user) {
-        return trainerRepository.findByUser(user);
-    }
 
-    @Override
-    public Trainee getTraineeProfile(User user) {
-        return traineeRepository.findByUser(user);
-    }
 
-    @Override
-    public List<Trainee> getTrainees() {
-        return traineeRepository.getNotAssignedTrainees();
-    }
-
-    @Override
-    public Optional<Trainee> getTraineeById(long traineeId) {
-        return traineeRepository.findById(traineeId);
-    }
-
-    @Override
-    public List<Trainer> getTrainers() {
-        return trainerRepository.findAll();
-    }
-
-    @Override
-    public Optional<Trainer> getTrainerById(long trainerId) {
-        return trainerRepository.findById(trainerId);
-    }
     @Override
     public List<Schedule> getAllScheduleByCourse(Course course) {
         return scheduleRepository.findAllByCourse(course);
@@ -270,20 +257,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    private Trainee saveTrainee(String firstName, String lastName, User user) {
-        Trainee trainee = new Trainee();
-        trainee.setFirstName(firstName);
-        trainee.setLastName(lastName);
-        trainee.setUser(user);
-        return traineeRepository.save(trainee);
-    }
-
-    private Trainer saveTrainer(String firstName, String lastName, User user){
-        Trainer trainer = new Trainer();
-        trainer.setFirstName(firstName);
-        trainer.setLastName(lastName);
-        trainer.setUser(user);
-        return trainerRepository.save(trainer);
+    private void sendEmail(){
+        //        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
+//        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
+//        userVerificationCenter.setUser(user);
+//        userVerificationCenter.setVerificationCode(randomCode);
+//        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
+//        userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
+//        userVerificationCenterRepository.save(userVerificationCenter);
+//        emailService.sendVerificationEmail(user,randomCode);
     }
 
 }

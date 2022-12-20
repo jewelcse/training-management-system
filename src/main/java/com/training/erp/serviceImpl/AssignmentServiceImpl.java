@@ -18,15 +18,12 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired
     private AssignmentRepository assignmentRepository;
     @Autowired
-    private TraineesAssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
+    private AssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private BatchRepository batchRepository;
-    @Autowired
     private CourseRepository courseRepository;
-    @Autowired
-    private TrainerRepository trainerRepository;
+
 
     @Override
     public void createAssignment(AssignmentRequestDto assignmentRequestDto, Principal principal) throws UserNotFoundException, CourseNotFoundException {
@@ -36,12 +33,10 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         Course course = courseRepository.findById(assignmentRequestDto.getCourse_id())
                 .orElseThrow(() -> new CourseNotFoundException("Course not found"));
-        Trainer trainer = course.getTrainer();
         Assignment assignment = new Assignment();
         assignment.setTitle(assignmentRequestDto.getTitle());
-        assignment.setMarks(assignmentRequestDto.getMarks());
-        assignment.setFilePath(assignmentRequestDto.getFile_path());
-        assignment.setTrainer(trainer);
+        assignment.setTotalMarks(assignmentRequestDto.getMarks());
+        assignment.setFileLocation(assignmentRequestDto.getFile_path());
         assignment.setCourse(course);
         assignmentRepository.save(assignment);
     }
@@ -56,9 +51,9 @@ public class AssignmentServiceImpl implements AssignmentService {
         User user = userRepository
                 .findByUsername(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Trainer trainer = trainerRepository.findByUser(user);
 
-        return assignmentRepository.findAllAssignmentsByUserId(trainer.getId());
+
+        return null;
     }
 
     @Override
@@ -82,21 +77,21 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public List<TraineesAssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId) throws AssignmentNotFoundException {
+    public List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId) throws AssignmentNotFoundException {
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
         return traineesAssignmentSubmissionRepository.findAllByAssignment(assignment);
     }
 
     @Override
-    public TraineesAssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) throws TraineesAssignmentSubmissionNotFoundException {
+    public AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) throws TraineesAssignmentSubmissionNotFoundException {
         return traineesAssignmentSubmissionRepository.findById(submissionId)
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
     }
 
     @Override
     public void updateSubmission(AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException {
-        TraineesAssignmentSubmission traineesAssignmentSubmissions
+        AssignmentSubmission traineesAssignmentSubmissions
                 = traineesAssignmentSubmissionRepository.findById(submission.getSubmissionId())
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
         traineesAssignmentSubmissions.setObtainedMarks(submission.getMarks());

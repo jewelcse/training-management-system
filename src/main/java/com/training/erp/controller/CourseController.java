@@ -8,9 +8,7 @@ import com.training.erp.exception.TrainerNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
-import com.training.erp.model.response.CourseFullProfileResponse;
 import com.training.erp.model.response.MessageResponse;
-import com.training.erp.repository.TrainerRepository;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.service.BatchService;
 import com.training.erp.service.CourseService;
@@ -18,7 +16,6 @@ import com.training.erp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +32,7 @@ public class CourseController {
     private BatchService batchService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private TrainerRepository trainerRepository;
+
     @Autowired
     private AssignmentService assignmentService;
 
@@ -67,9 +63,9 @@ public class CourseController {
         User user = userService
                 .findByUsername(principal.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Trainer trainer = trainerRepository.findByUser(user);
 
-        return ResponseEntity.ok(courseService.getCoursesByTrainerId(trainer.getId()));
+
+        return ResponseEntity.ok(null);
     }
 
     // Update Course
@@ -100,26 +96,18 @@ public class CourseController {
     public ResponseEntity<?> getCourseProfileByCourseId(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
 
         Course course = courseService.getCourseByCourseId(courseId);
-        Trainer trainer;
-        if (course.getTrainer() == null) {
-            trainer = new Trainer();
-        } else {
-            trainer = courseService.getTrainerProfileByCourse(course);
-        }
+
 
         List<Assignment> assignments = assignmentService.getAssignmentsByCourse(course.getId());
 
-        return ResponseEntity.ok(new CourseFullProfileResponse(course, trainer, assignments));
+        return ResponseEntity.ok(null);
     }
 
     // Assign trainer to course
     @GetMapping("/courses/{course-id}/trainers/{trainer-id}")
     public ResponseEntity<?> assignTrainerToCourse(@PathVariable("course-id") long courseId, @PathVariable("trainer-id") long trainerId) throws CourseNotFoundException, TrainerNotFoundException {
         Course course = courseService.getCourseByCourseId(courseId);
-        Trainer trainer = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not Found"));
-        course.setTrainer(trainer);
-        courseService.updateCourseTrainer(course);
+
         return ResponseEntity.ok(new MessageResponse("Trainer Assigned Success"));
     }
 
@@ -147,16 +135,7 @@ public class CourseController {
     // Remove Trainer from Course
     @DeleteMapping("/courses/{course-id}/trainers/{trainer-id}")
     public ResponseEntity<?> removeTrainerFromCourse(@PathVariable("course-id") long courseId, @PathVariable("trainer-id") long trainerId) throws CourseNotFoundException, TrainerNotFoundException {
-        Course course = courseService.getCourseByCourseId(courseId);
-        Trainer trainer = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not Found"));
-        // check either the trainer is assigned before to the course or not
-        if (course.getTrainer() != trainer) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Trainer not found For This course");
-        }
-        courseService.removeTrainerFromCourse(course);
+
         return ResponseEntity.ok(new MessageResponse("Trainer Remove Success"));
     }
 

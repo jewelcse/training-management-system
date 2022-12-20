@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
+import java.util.HashSet;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -24,18 +25,26 @@ public class Assignment {
     private String title;
 
     @Column(name = "marks")
-    private int marks;
+    private int totalMarks;
 
-    @Column(name = "file_path")
-    private String filePath;
+    @Column(name = "file_location")
+    private String fileLocation;
 
 
     @JsonBackReference
     @ManyToOne
-    private Trainer trainer;
+    private User createdBy;
 
     @JsonBackReference
     @ManyToOne
     private Course course;
+
+    @JsonBackReference
+    @ManyToOne
+    private Batch batch;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    private Set<AssignmentSubmission> submissions = new HashSet<>();
 
 }

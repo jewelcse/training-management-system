@@ -8,6 +8,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,26 +31,32 @@ public class Batch {
     private Timestamp startDate;
     private Timestamp endDate;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "batch")
-    Set<Trainee> trainees;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    Set<Trainer> trainers;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "batch_users",
+            joinColumns = @JoinColumn(
+                    name = "batch_id", referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"
+            )
+    )
+    Set<User> users= new HashSet<>();
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY,
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "batch_courses",
+            joinColumns = @JoinColumn(
+                    name = "batch_id", referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "course_id", referencedColumnName = "id"
+            )
+    )
+    Set<Course> courses = new HashSet<>();
 
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    Set<Course> courses;
+
 
 
 

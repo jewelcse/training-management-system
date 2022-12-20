@@ -101,79 +101,14 @@ public class AuthController {
         return new ResponseEntity<>(userService.save(request), HttpStatus.CREATED);
     }
 
-    // Add user
-    //@CacheEvict(allEntries = true)
     @PostMapping("/users")
     public ResponseEntity<?> addUser(@Valid @RequestBody UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
-        // Check the username is already used or not
         if (userService.existsByEmail(request.getEmail())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error:" + request.getEmail() + " is already in use!"));
         }
-
-        // Generate username by the user firstName and lastName
-        // With @ special character
-        String randomUserName = request.getFirst_name().toLowerCase() + "@" + request.getLast_name().toLowerCase();
-        // Generate a random password with length 8
-        String randomUserPassword = RandomString.make(8);
-
-        // Create a new user Object
-        User user = new User();
-        user.setUsername(randomUserName);
-        user.setEmail(request.getEmail());
-        // Encoded the password
-        user.setPassword(encoder.encode(randomUserPassword));
-        // Since the user is creating by admin
-        // So, the account us verified and activated
-        // No need to verify through email by user
-        // And admin no need to activate the account
-        user.setEnabled(true);
-        user.setNonLocked(true);
-        String stringRole = request.getRole();
-        Set<Role> roles = new HashSet<>();
-        boolean isTrainee = false;
-        boolean isTrainer = false;
-        if (stringRole == null) {
-            Role userRole = roleRepository
-                    .findByName(ERole.ROLE_TRAINEE)
-                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-
-            roles.add(userRole);
-            isTrainee = true;
-
-        } else {
-            switch (stringRole) {
-                case "ROLE_ADMIN":
-                    Role adminRole = roleRepository
-                            .findByName(ERole.ROLE_ADMIN)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_ADMIN + " doesn't exist!"));
-                    roles.add(adminRole);
-                    break;
-
-                case "ROLE_TRAINER":
-                    Role studentRole = roleRepository
-                            .findByName(ERole.ROLE_TRAINER)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
-                    roles.add(studentRole);
-                    isTrainee = false;
-                    isTrainer = true;
-                    break;
-
-                default:
-                    Role userRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-
-                    roles.add(userRole);
-                    isTrainee = true;
-                    isTrainer = false;
-
-            }
-        }
-        user.setRoles(roles);
-        userService.saveUserByAdmin(user, request.getFirst_name(), request.getLast_name(), isTrainee, isTrainer);
-
-        emailService.sendUserCredential(request.getEmail(), request.getFirst_name(), request.getLast_name(), randomUserName, randomUserPassword);
+        userService.save(request);
         return ResponseEntity.ok(new MessageResponse("Add user account successfully!"));
     }
 
@@ -238,13 +173,7 @@ public class AuthController {
         // Implemented Factory Design pattern
         // If the role is trainee, then return the trainee profile by using the user object
         // Else return the Trainer profile
-        if (user.getRoles().stream().anyMatch(role -> role.getName().toString().equals("ROLE_TRAINEE"))) {
-            return ResponseEntity.ok(userService.getTraineeProfile(user));
-        } else if (user.getRoles().stream().anyMatch(role -> role.getName().toString().equals("ROLE_TRAINER"))) {
-            return ResponseEntity.ok(userService.getTrainerProfile(user));
-        }
-        // If it is not trainee or trainer
-        // Then return only user profile by default
+
         return ResponseEntity.ok(userService.findById(userId));
     }
 
@@ -259,43 +188,7 @@ public class AuthController {
         List<Batch> batches = new ArrayList<>();
         // Check the user is trainee or not
         // If it is trainee, then get the trainee profile
-        if (user.getRoles().stream().anyMatch(role -> role.getName().toString().equals("ROLE_TRAINEE"))) {
-            Trainee trainee = userService.getTraineeProfile(user);
-            // If the trainee is not assigned any batch yet
-            // Then add an empty batch
-            if (trainee.getBatch() == null) {
-                batches.add(new Batch());
-            } else {
-                // If the trainee already has assigned any batch
-                // Get the batch profile by trainee
-                Batch batch = batchService.getBatchByTrainee(trainee);
-                batches.add(batch);
-            }
-            // Create the responses object
-            UserProfileResponse<Trainee> response = new UserProfileResponse<>();
-            response.setProfile(trainee);
-            response.setUser(user);
-            // Set Courses as null
-            // Because trainees are not directly assigned any course
-            // Trainees get all the courses by default what the batch contains
-            response.setCourses(null);
-            response.setBatches(batches);
-            return ResponseEntity.ok(response);
-        } else if (user.getRoles().stream().anyMatch(role -> role.getName().toString().equals("ROLE_TRAINER"))) {
-            // Getting the trainer profile
-            Trainer trainer = userService.getTrainerProfile(user);
-            // Get the list of assigned courses of a trainer
-            List<Course> courses = courseService.getCoursesByTrainerId(trainer.getId());
-            // get the list of assigned batches of a trainer
-            batches = batchService.getBatchesByTrainerId(trainer.getId());
-            // Create the response object
-            UserProfileResponse<Trainer> response = new UserProfileResponse<>();
-            response.setUser(user);
-            response.setProfile(trainer);
-            response.setCourses(courses);
-            response.setBatches(batches);
-            return ResponseEntity.ok(response);
-        }
+
         return ResponseEntity.ok(null);
     }
 

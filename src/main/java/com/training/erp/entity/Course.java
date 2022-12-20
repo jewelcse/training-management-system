@@ -26,18 +26,6 @@ public class Course {
     private String courseName;
     private String courseDescription;
 
-    @JsonBackReference
-    @ManyToOne
-    private Trainer trainer;
-    @JsonBackReference
-    @ManyToMany(fetch = FetchType.LAZY,
-            mappedBy = "courses",
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
-    Set<Batch> batches;
-
     @JsonIgnore
     @OneToMany(mappedBy = "course")
     List<Assignment> Assignments;
