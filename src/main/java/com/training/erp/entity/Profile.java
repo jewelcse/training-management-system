@@ -61,8 +61,6 @@ public class Profile {
     @Size(max = 32)
     private String zipCode;
 
-    // Unidirectional
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "profile")
     private User user;
 }

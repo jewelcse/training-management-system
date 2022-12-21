@@ -15,6 +15,6 @@ public class UserDetails {
     private String username;
     private String email;
     private boolean isEnabled;
-    private boolean isLocked;
+    private boolean isNonLocked;
     private Set<Role> roles;
 }

@@ -33,6 +33,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private ProfileRepository profileRepository;
+    @Autowired
     private RoleRepository roleRepository;
     @Autowired
     private ScheduleRepository scheduleRepository;
@@ -75,43 +77,44 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encoder.encode(request.getPassword()));
         String stringRole = request.getRole();
         Set<Role> roles = new HashSet<>();
-        // response
-        RegisterResponse response = new RegisterResponse();
-        response.setFirstName(request.getFirstName());
-        response.setLastName(request.getLastName());
-        response.setEmail(request.getEmail());
-        response.setUsername(request.getUsername());
         if (stringRole == null) {
             Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
                     .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
             roles.add(defaultRole);
-            response.setAccountVerified(false);
-            response.setProfileType("TRAINEE ACCOUNT");
         } else {
             switch (stringRole) {
                 case "ROLE_TRAINER":
                     Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
                     roles.add(trainerRole);
-                    response.setAccountVerified(false);
-                    response.setProfileType("TRAINER ACCOUNT");
                     break;
                 case "ROLE_TRAINEE":
                     Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
                     roles.add(traineeRole);
-                    response.setAccountVerified(false);
-                    response.setProfileType("TRAINEE ACCOUNT");
                     break;
             }
         }
         user.setRoles(roles);
         Profile profile = new Profile();
-        user.setUserProfile(profile);
+        profile.setFirstName(request.getFirstName());
+        profile.setLastName(request.getLastName());
+
+        user.setProfile(profile);
+
         userRepository.save(user);
-        // sent verification mail
-        //todo: save profile while creating user account
-        return response;
+
+        //todo: sent verification mail
+
+        // response
+        return RegisterResponse.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .isAccountNonLocked(true)
+                .isAccountVerified(false) // enabled is renamed here with verified attribute
+                .build();
     }
 
     @Override

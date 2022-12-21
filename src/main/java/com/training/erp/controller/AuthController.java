@@ -127,7 +127,7 @@ public class AuthController {
                 .builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .isLocked(user.isNonLocked())
+                .isNonLocked(user.isNonLocked())
                 .isEnabled(user.isEnabled())
                 .roles(user.getRoles())
                 .build();
@@ -140,22 +140,11 @@ public class AuthController {
                 .orElseThrow(() -> new UserNotFoundException("USER NOT FOUND!"));
         UserProfile profile = UserProfile
                 .builder()
-                .firstName(user.getUserProfile().getFirstName())
-                .lastName(user.getUserProfile().getLastName())
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .isEnabled(user.isEnabled())
-                .isLocked(!user.isNonLocked())
-                .address1(user.getUserProfile().getAddress1())
-                .address2(user.getUserProfile().getAddress2())
-                .state(user.getUserProfile().getState())
-                .street(user.getUserProfile().getStreet())
-                .city(user.getUserProfile().getCity())
-                .country(user.getUserProfile().getCountry())
-                .zipCode(user.getUserProfile().getZipCode())
-                .dateOfBirth(user.getUserProfile().getDateOfBirth())
-                .phoneNumber(user.getUserProfile().getPhoneNumber())
-                .gender(user.getUserProfile().getGender())
+                .isNonLocked(user.isNonLocked())
+
                 .roles(user.getRoles())
                 .build();
 

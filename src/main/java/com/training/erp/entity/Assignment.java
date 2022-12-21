@@ -37,14 +37,14 @@ public class Assignment {
 
     @JsonBackReference
     @ManyToOne
-    private Course course;
-
-    @JsonBackReference
-    @ManyToOne
     private Batch batch;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private Set<AssignmentSubmission> submissions = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 
 }

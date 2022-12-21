@@ -26,8 +26,8 @@ public class Course {
     private String courseName;
     private String courseDescription;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "course")
-    List<Assignment> Assignments;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "course_id")
+    private List<Assignment> assignments;
 
 }

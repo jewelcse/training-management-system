@@ -1,23 +1,19 @@
 package com.training.erp.model.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class RegisterResponse {
 
     private String firstName;
     private String lastName;
     private String email;
     private String username;
-    private boolean isAccountLocked;
+    private boolean isAccountNonLocked;
     private boolean isAccountVerified;
-    private String profileType="TRAINEE ACCOUNT";
-
 }
