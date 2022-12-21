@@ -5,6 +5,7 @@ import com.training.erp.exception.BatchNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.BatchRequestDto;
 import com.training.erp.model.request.UserAssignRequestDto;
+import com.training.erp.model.response.BatchDetailsDto;
 import com.training.erp.model.response.BatchFullProfileResponse;
 import com.training.erp.model.response.BatchResponseDto;
 import com.training.erp.repository.*;
@@ -56,8 +57,18 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
-    public Optional<Batch> getBatchById(long batchId) throws BatchNotFoundException {
-        return batchRepository.findById(batchId);
+    public BatchDetailsDto getBatchById(long batchId){
+        Optional<Batch> batch = batchRepository.findById(batchId);
+        Set<Course> courses = batch.get().getCourses();
+        Set<User> users = batch.get().getUsers();
+        return BatchDetailsDto.builder()
+                .batchName(batch.get().getBatchName())
+                .batchDescription(batch.get().getBatchDescription())
+                .startDate(batch.get().getStartDate())
+                .endDate(batch.get().getEndDate())
+                .course(courses)
+                .users(users)
+                .build();
     }
 
 

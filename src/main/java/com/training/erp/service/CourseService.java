@@ -14,8 +14,8 @@ public interface CourseService {
     CourseResponseDto save(CourseRequestDto request);
     boolean existsByCourse(String course_name);
     List<Course> getCourses();
-    void updateCourse(CourseUpdateRequest request) throws UserNotFoundException, CourseNotFoundException;
-    void deleteCourseByCourseId(long courseId) throws CourseNotFoundException;
-    Course getCourseByCourseId(long courseId) throws CourseNotFoundException;
+    void updateCourse(CourseUpdateRequest request);
+    void deleteCourseByCourseId(long courseId);
+    Course getCourseByCourseId(long courseId);
     List<Course> getCoursesByBatch(Batch batch);
 }

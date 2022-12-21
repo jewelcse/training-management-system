@@ -5,18 +5,19 @@ import com.training.erp.entity.AssignmentSubmission;
 import com.training.erp.exception.*;
 import com.training.erp.model.request.AssignmentRequestDto;
 import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
+import com.training.erp.model.response.AssignmentResponseDto;
 
 import java.security.Principal;
 import java.util.List;
 
 public interface AssignmentService {
-    void createAssignment(AssignmentRequestDto assignmentRequestDto, Principal principal) throws BatchNotFoundException, UserNotFoundException, CourseNotFoundException;
+    AssignmentResponseDto save(AssignmentRequestDto assignmentRequestDto, Principal principal);
     List<Assignment> getAssignments();
     List<Assignment> getAssignments(Principal principal);
-    List<Assignment> getAssignmentsByCourse(long courseId) throws CourseNotFoundException;
-    Assignment getAssignmentByAssignmentId(long assignmentId) throws AssignmentNotFoundException;
-    void deleteAssignmentByAssignmentId(long assignmentId) throws AssignmentNotFoundException;
-    List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId) throws AssignmentNotFoundException;
-    AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) throws TraineesAssignmentSubmissionNotFoundException;
-    void updateSubmission(AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException;
+    List<Assignment> getAssignmentsByCourse(long courseId);
+    Assignment getAssignmentByAssignmentId(long assignmentId);
+    void deleteAssignmentByAssignmentId(long assignmentId);
+    List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId);
+    AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId);
+    void updateSubmission(AssignmentSubmissionUpdateRequest submission);
 }

@@ -46,10 +46,10 @@ AssignmentController {
     @Value("${fileLink}")
     private String link;
     // Create new assignment
-    @Secured("ROLE_TRAINER")
+    //@Secured("ROLE_TRAINER")
     @PostMapping("/assignments")
-    public ResponseEntity<MessageResponse> createAssignment(@RequestBody AssignmentRequestDto assignmentRequestDto, Principal principal) throws BatchNotFoundException, UserNotFoundException, CourseNotFoundException {
-        assignmentService.createAssignment(assignmentRequestDto,principal);
+    public ResponseEntity<MessageResponse> create(@RequestBody AssignmentRequestDto assignmentRequestDto, Principal principal) throws BatchNotFoundException, UserNotFoundException, CourseNotFoundException {
+        assignmentService.save(assignmentRequestDto,principal);
         return new ResponseEntity<>(new MessageResponse("Assignment Created Successfully"), HttpStatus.CREATED);
     }
     // Get all assignment
@@ -124,7 +124,7 @@ AssignmentController {
     }
     // Submit the assignment by trainee
     @PostMapping("/assignments/trainees")
-    public ResponseEntity<?> uploadAssignment(@RequestParam("file") MultipartFile file,@RequestParam("assignmentId") long assignmentId) throws AssignmentNotFoundException {
+    public ResponseEntity<?> uploadAssignment(@RequestParam("file") MultipartFile file,@RequestParam("assignmentId") long assignmentId){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username="";
         if (principal instanceof UserDetails) {
@@ -152,10 +152,10 @@ AssignmentController {
             // Save the pdf/ image/ docs file to upload folder
             String filePath = filesStorageService.saveFile(file);
             message = "Submitted the Assignment successfully";
-           // traineesAssignmentSubmission.setFileLocation(assignment);
+            traineesAssignmentSubmission.setFileLocation(link+filePath);
             traineesAssignmentSubmission.setObtainedMarks(0);
-            //traineesAssignmentSubmission.setFilePath(link+filePath);
-            //traineesAssignmentSubmission.setCourse(assignment.getCourse());
+            traineesAssignmentSubmission.setAssignment(assignment);
+            traineesAssignmentSubmission.setUser(user);
             traineesAssignmentSubmissionRepository.save(traineesAssignmentSubmission);
             return ResponseEntity.status(HttpStatus.OK).body(message);
         } catch (Exception e) {

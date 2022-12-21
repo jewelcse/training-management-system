@@ -4,6 +4,8 @@ import com.training.erp.entity.*;
 import com.training.erp.exception.*;
 import com.training.erp.model.request.AssignmentRequestDto;
 import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
+import com.training.erp.model.response.AssignmentResponseDto;
+import com.training.erp.model.response.BatchResponseDto;
 import com.training.erp.repository.*;
 import com.training.erp.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
@@ -24,21 +27,47 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    private BatchRepository batchRepository;
+
 
     @Override
-    public void createAssignment(AssignmentRequestDto assignmentRequestDto, Principal principal) throws UserNotFoundException, CourseNotFoundException {
+    public AssignmentResponseDto save(AssignmentRequestDto request, Principal principal){
 
-        User user = userRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-        Course course = courseRepository.findById(assignmentRequestDto.getCourse_id())
-                .orElseThrow(() -> new CourseNotFoundException("Course not found"));
-        Assignment assignment = new Assignment();
-        assignment.setTitle(assignmentRequestDto.getTitle());
-        assignment.setTotalMarks(assignmentRequestDto.getMarks());
-        assignment.setFileLocation(assignmentRequestDto.getFile_path());
-        assignment.setCourse(course);
+        Optional<User> user = userRepository
+                .findByUsername(principal.getName());
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("USER NOT FOUND");
+        }
+        Optional<Batch> batch = batchRepository.findById(request.getBatchId());
+        if (batch.isEmpty()) {
+            throw new BatchNotFoundException("BATCH NOT FOUND");
+        }
+
+        Optional<Course> course = courseRepository.findById(request.getCourseId());
+        if (course.isEmpty()) {
+            throw new CourseNotFoundException("COURSE NOT FOUND");
+        }
+
+
+        Assignment assignment = Assignment.builder()
+                .title(request.getTitle())
+                .fileLocation(request.getFilePath())
+                .batch(batch.get())
+                .course(course.get())
+                .createdBy(user.get())
+                .totalMarks(request.getMarks())
+                .build();
         assignmentRepository.save(assignment);
+
+        return AssignmentResponseDto.builder()
+                .title(request.getTitle())
+                .marks(request.getMarks())
+                .filePath(request.getFilePath())
+                .batchId(batch.get().getId())
+                .courseId(course.get().getId())
+                .userId(user.get().getId())
+                .build();
     }
 
     @Override
@@ -57,40 +86,40 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public List<Assignment> getAssignmentsByCourse(long courseId) throws CourseNotFoundException {
+    public List<Assignment> getAssignmentsByCourse(long courseId){
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException("Course not found"));
         return assignmentRepository.findAllByCourse(course);
     }
 
     @Override
-    public Assignment getAssignmentByAssignmentId(long assignmentId) throws AssignmentNotFoundException {
+    public Assignment getAssignmentByAssignmentId(long assignmentId){
         return assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
     }
 
     @Override
-    public void deleteAssignmentByAssignmentId(long assignmentId) throws AssignmentNotFoundException {
+    public void deleteAssignmentByAssignmentId(long assignmentId){
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
         assignmentRepository.deleteById(assignment.getId());
     }
 
     @Override
-    public List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId) throws AssignmentNotFoundException {
+    public List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId){
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
         return traineesAssignmentSubmissionRepository.findAllByAssignment(assignment);
     }
 
     @Override
-    public AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) throws TraineesAssignmentSubmissionNotFoundException {
+    public AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) {
         return traineesAssignmentSubmissionRepository.findById(submissionId)
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
     }
 
     @Override
-    public void updateSubmission(AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException {
+    public void updateSubmission(AssignmentSubmissionUpdateRequest submission){
         AssignmentSubmission traineesAssignmentSubmissions
                 = traineesAssignmentSubmissionRepository.findById(submission.getSubmissionId())
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));

@@ -36,13 +36,13 @@ public class ScheduleController {
     public ResponseEntity<?> createSchedule(@RequestBody ScheduleRequest request) throws CourseNotFoundException, BatchNotFoundException {
 
         // Get the batch, course, and also trainer
-        Batch batch = batchService.getBatchById(request.getBatch_id()).get();
+        //Batch batch = batchService.getBatchById(request.getBatch_id()).get();
         Course course = courseService.getCourseByCourseId(request.getCourse_id());
 
 
         // Start_date will be greater than all the same batch's previous schedules end_date
         // Get the all schedules by course
-        List<Schedule> batchesSchedule = scheduleService.getSchedulesByCourseAndBatch(course,batch);
+        List<Schedule> batchesSchedule = scheduleService.getSchedulesByCourseAndBatch(course,null);
         // Check if the trainer/course is available that time or not
         if (isNotValidSchedule(batchesSchedule,request.getStart_date().getTime())){
             return ResponseEntity.ok("Invalid Schedule for Time: start_time"+request.getStart_date() + " end_time" + request.getEnd_date());
@@ -69,10 +69,11 @@ public class ScheduleController {
     @GetMapping("/schedules/batches/{batch-id}")
     public ResponseEntity<List<Schedule>> getAllScheduleByBatch(@PathVariable("batch-id") long batchId) throws BatchNotFoundException {
 
-        Batch batch = batchService.getBatchById(batchId)
-                .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
+//        Batch batch = batchService.getBatchById(batchId)
+//                .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
 
-        return ResponseEntity.ok(scheduleService.getAllScheduleByBatch(batch));
+        //ResponseEntity.ok(scheduleService.getAllScheduleByBatch(batch));
+        return null;
 
     }
 

@@ -81,8 +81,8 @@ public class CourseController {
     }
 
     // Get single course by course ID
-    @GetMapping("/courses/{course-id}")
-    public ResponseEntity<?> getCourseByCourseId(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
+    @GetMapping("/courses/{id}")
+    public ResponseEntity<?> getCourse(@PathVariable("id") long courseId){
         return ResponseEntity.ok(courseService.getCourseByCourseId(courseId));
     }
 
@@ -112,22 +112,23 @@ public class CourseController {
     // Add course to batch
     @GetMapping("/courses/{course-id}/batches/{batch-id}")
     public ResponseEntity<?> addCourseToBatch(@PathVariable("course-id") long courseId, @PathVariable("batch-id") long batchId) throws CourseNotFoundException, BatchNotFoundException {
-        Course course = courseService.getCourseByCourseId(courseId);
-        Batch batch = batchService.getBatchById(batchId)
-                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
-        Set<Course> courses = batch.getCourses();
-        courses.add(course);
-        batch.setCourses(courses);
-        batchService.updateBatch(batch);
+       Course course = courseService.getCourseByCourseId(courseId);
+//        Batch batch = batchService.getBatchById(batchId)
+////                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
+//        Set<Course> courses = batch.getCourses();
+//        courses.add(course);
+//        batch.setCourses(courses);
+//        batchService.updateBatch(batch);
         return ResponseEntity.ok(new MessageResponse("Course Added Success"));
     }
 
     // Get courses by batch ID
     @GetMapping("/courses/batches/{batch-id}")
     public ResponseEntity<List<Course>> getCoursesByBatchId(@PathVariable("batch-id") long batchId) throws BatchNotFoundException {
-        Batch batch = batchService.getBatchById(batchId)
-                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
-        return ResponseEntity.ok(courseService.getCoursesByBatch(batch));
+//        Batch batch = batchService.getBatchById(batchId)
+//                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
+        //ResponseEntity.ok(courseService.getCoursesByBatch(batch));
+        return null;
     }
 
     // Remove Trainer from Course

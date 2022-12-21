@@ -44,7 +44,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void updateCourse(CourseUpdateRequest request) throws CourseNotFoundException {
+    public void updateCourse(CourseUpdateRequest request){
         Course course = courseRepository.findById(request.getCourse_id())
                         .orElseThrow(()-> new CourseNotFoundException("Course not found"));
         course.setId(course.getId());
@@ -55,14 +55,14 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public void deleteCourseByCourseId(long courseId) throws CourseNotFoundException {
+    public void deleteCourseByCourseId(long courseId){
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(()-> new CourseNotFoundException("Course not found"));
         courseRepository.delete(course);
     }
 
     @Override
-    public Course getCourseByCourseId(long courseId) throws CourseNotFoundException {
+    public Course getCourseByCourseId(long courseId){
         return courseRepository.findById(courseId)
                 .orElseThrow(()-> new CourseNotFoundException("Course not found"));
     }

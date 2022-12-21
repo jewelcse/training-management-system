@@ -2,6 +2,7 @@ package com.training.erp.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 @Entity
 @Table(name = "assignments")
 public class Assignment {
@@ -39,10 +41,12 @@ public class Assignment {
     @ManyToOne
     private Batch batch;
 
+    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private Set<AssignmentSubmission> submissions = new HashSet<>();
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;

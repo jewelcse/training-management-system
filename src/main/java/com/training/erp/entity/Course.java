@@ -26,7 +26,9 @@ public class Course {
     private String courseName;
     private String courseDescription;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    @OneToMany(cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @JoinColumn(name = "course_id")
     private List<Assignment> assignments;
 
