@@ -32,8 +32,7 @@ import static com.training.erp.util.UtilProperties.*;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private ProfileRepository profileRepository;
+
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
@@ -68,45 +67,23 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public RegisterResponse save(RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
-        // user
+        //user
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setEnabled(false);
         user.setNonLocked(true);
         user.setPassword(encoder.encode(request.getPassword()));
-        String stringRole = request.getRole();
-        Set<Role> roles = new HashSet<>();
-        if (stringRole == null) {
-            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-            roles.add(defaultRole);
-        } else {
-            switch (stringRole) {
-                case "ROLE_TRAINER":
-                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
-                    roles.add(trainerRole);
-                    break;
-                case "ROLE_TRAINEE":
-                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-                    roles.add(traineeRole);
-                    break;
-            }
-        }
-        user.setRoles(roles);
+        user.setRoles(checkRoles(request.getRole()));
+        //profile
         Profile profile = new Profile();
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
 
         user.setProfile(profile);
-
         userRepository.save(user);
-
         //todo: sent verification mail
-
-        // response
+        //response
         return RegisterResponse.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
@@ -119,53 +96,36 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserAddResponse save(UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
-        // generate random username and password
+        //generate random username and password
         String randomUserPassword = RandomString.make(8);
-        String finalUsername = request.getFirstName().toLowerCase() + "@" + RandomString.make(4);
-
+        String randomUsername = request.getFirstName().toLowerCase() + "@" + RandomString.make(4);
+        //user
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setUsername(finalUsername);
+        user.setUsername(randomUsername);
         user.setPassword(encoder.encode(randomUserPassword));
         user.setNonLocked(true);
         user.setEnabled(true);
+        user.setRoles(checkRoles(request.getRole()));
+        //profile
+        Profile profile = new Profile();
+        profile.setFirstName(request.getFirstName());
+        profile.setLastName(request.getLastName());
 
-        String stringRole = request.getRole();
-        Set<Role> roles = new HashSet<>();
+        user.setProfile(profile);
+        userRepository.save(user);
+        //todo: sent mail with credentials
+        return UserAddResponse
+                .builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .username(randomUsername)
+                .build();
 
-        if (stringRole == null) {
-            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-            roles.add(defaultRole);
-            user.setRoles(roles);
-            userRepository.save(user);
-        } else {
-            switch (stringRole) {
-                case "ROLE_TRAINER":
-                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
-                    roles.add(trainerRole);
-                    user.setRoles(roles);
-                    userRepository.save(user);
-                    break;
-                case "ROLE_TRAINEE":
-                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-                    roles.add(traineeRole);
-                    user.setRoles(roles);
-                    userRepository.save(user);
-                    break;
-            }
-        }
-        UserAddResponse response = new UserAddResponse();
-        response.setFirstName(request.getFirstName());
-        response.setLastName(response.getLastName());
-        response.setEmail(request.getEmail());
-        response.setUsername(finalUsername);
-
-        // sent main with credentials
-        return response;
     }
+
+
 
 
     @Override
@@ -260,5 +220,28 @@ public class UserServiceImpl implements UserService {
 //        userVerificationCenterRepository.save(userVerificationCenter);
 //        emailService.sendVerificationEmail(user,randomCode);
     }
+    private Set<Role> checkRoles(String stringRole) throws RoleNotFoundException {
+        Set<Role> roles = new HashSet<>();
+        if (stringRole == null) {
+            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
+            roles.add(defaultRole);
+        } else {
+            switch (stringRole) {
+                case "ROLE_TRAINER":
+                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " DOESN'T EXIST!"));
+                    roles.add(trainerRole);
+                    break;
+                case "ROLE_TRAINEE":
+                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
+                    roles.add(traineeRole);
+                    break;
+            }
+        }
+        return roles;
+    }
+
 
 }
