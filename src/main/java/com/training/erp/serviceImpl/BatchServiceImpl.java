@@ -6,6 +6,7 @@ import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.BatchRequestDto;
 import com.training.erp.model.request.UserAssignRequestDto;
 import com.training.erp.model.response.BatchFullProfileResponse;
+import com.training.erp.model.response.BatchResponseDto;
 import com.training.erp.repository.*;
 import com.training.erp.service.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,21 @@ public class BatchServiceImpl implements BatchService {
     @Autowired
     private CourseRepository courseRepository;
     @Override
-    public void createNewBatch(BatchRequestDto request) {
+    public BatchResponseDto save(BatchRequestDto request) {
+        //batch
         Batch batch = new Batch();
-        batch.setBatchName(request.getBatch_name());
-        batch.setBatchDescription(request.getBatch_description());
-        batch.setStartDate(request.getStart_date());
-        batch.setEndDate(request.getEnd_date());
+        batch.setBatchName(request.getBatchName());
+        batch.setBatchDescription(request.getBatchDescription());
+        batch.setStartDate(request.getStartDate());
+        batch.setEndDate(request.getEndDate());
         batchRepository.save(batch);
+        //response
+        return BatchResponseDto.builder()
+                .batchName(request.getBatchName())
+                .batchDescription(request.getBatchDescription())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .build();
     }
 
     @Override

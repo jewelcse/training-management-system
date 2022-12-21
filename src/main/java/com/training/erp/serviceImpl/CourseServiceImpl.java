@@ -3,8 +3,9 @@ package com.training.erp.serviceImpl;
 import com.training.erp.entity.Batch;
 import com.training.erp.entity.Course;
 import com.training.erp.exception.CourseNotFoundException;
-import com.training.erp.model.request.CourseCreateRequest;
+import com.training.erp.model.request.CourseRequestDto;
 import com.training.erp.model.request.CourseUpdateRequest;
+import com.training.erp.model.response.CourseResponseDto;
 import com.training.erp.repository.CourseRepository;
 import com.training.erp.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,21 @@ public class CourseServiceImpl implements CourseService {
 
 
     @Override
-    public void createCourse(CourseCreateRequest request) {
+    public CourseResponseDto save(CourseRequestDto request) {
         Course course = new Course();
-        course.setCourseName(request.getCourse_name());
-        course.setCourseDescription(request.getCourse_description());
+        course.setCourseName(request.getCourseName());
+        course.setCourseDescription(request.getCourseDescription());
         courseRepository.save(course);
+        return CourseResponseDto.builder()
+                .courseName(request.getCourseName())
+                .courseDescription(request.getCourseDescription())
+                .build();
     }
 
 
     @Override
-    public boolean existsByCourse(String course_name) {
-        return courseRepository.existsByCourseName(course_name);
+    public boolean existsByCourse(String courseName) {
+        return courseRepository.existsByCourseName(courseName);
     }
 
     @Override

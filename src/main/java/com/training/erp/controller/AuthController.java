@@ -144,7 +144,18 @@ public class AuthController {
                 .username(user.getUsername())
                 .isEnabled(user.isEnabled())
                 .isNonLocked(user.isNonLocked())
-
+                .firstName(user.getProfile().getFirstName())
+                .lastName(user.getProfile().getLastName())
+                .phoneNumber(user.getProfile().getPhoneNumber())
+                .street(user.getProfile().getStreet())
+                .state(user.getProfile().getState())
+                .zipCode(user.getProfile().getZipCode())
+                .gender(user.getProfile().getGender())
+                .city(user.getProfile().getCity())
+                .country(user.getProfile().getCountry())
+                .dateOfBirth(user.getProfile().getDateOfBirth())
+                .address1(user.getProfile().getAddress1())
+                .address2(user.getProfile().getAddress2())
                 .roles(user.getRoles())
                 .build();
 

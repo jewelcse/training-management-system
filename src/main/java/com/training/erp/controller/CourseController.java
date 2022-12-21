@@ -6,7 +6,7 @@ import com.training.erp.exception.BatchNotFoundException;
 import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.exception.TrainerNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
-import com.training.erp.model.request.CourseCreateRequest;
+import com.training.erp.model.request.CourseRequestDto;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.service.AssignmentService;
@@ -36,17 +36,15 @@ public class CourseController {
     @Autowired
     private AssignmentService assignmentService;
 
-    // Create Course
-    //@Secured("ROLE_ADMIN")
     @PostMapping("/courses")
-    public ResponseEntity<?> createCourse(@RequestBody CourseCreateRequest request) {
+    public ResponseEntity<?> create(@RequestBody CourseRequestDto request) {
 
-        if (courseService.existsByCourse(request.getCourse_name())) {
+        if (courseService.existsByCourse(request.getCourseName())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("The course already added!"));
         }
-        courseService.createCourse(request);
+        courseService.save(request);
         return new ResponseEntity<>(new MessageResponse("Course created successfully"), HttpStatus.CREATED);
     }
 

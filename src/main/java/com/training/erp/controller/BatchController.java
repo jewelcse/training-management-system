@@ -26,28 +26,25 @@ public class BatchController {
     private UserService userService;
     @Autowired
     private CourseService courseService;
-    // Create batch
+
     @PostMapping("/batches")
-    public ResponseEntity<MessageResponse> createBatch(@RequestBody BatchRequestDto request){
-        // Check the batch is already added or not
-        if(batchService.existsByBatchName(request.getBatch_name())){
+    public ResponseEntity<MessageResponse> create(@RequestBody BatchRequestDto request){
+        if(batchService.existsByBatchName(request.getBatchName())){
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse(request.getBatch_name() +" already exist!"));
+                    .body(new MessageResponse(request.getBatchName() +" ALREADY EXIST!"));
         }
-        batchService.createNewBatch(request);
-        return ResponseEntity.ok(new MessageResponse("Training Batch created successfully"));
+        batchService.save(request);
+        return ResponseEntity.ok(new MessageResponse("BATCH CREATED SUCCESS!"));
     }
 
-    // Get Batches
     @GetMapping("/batches")
     public ResponseEntity<List<Batch>> getBatches(){
         return ResponseEntity.ok(batchService.getAllBatch());
     }
 
-    // Get batch by batch ID
-    @GetMapping("/batches/{batch-id}")
-    public ResponseEntity<Batch> getBatch(@PathVariable("batch-id") long batchId) throws BatchNotFoundException {
+    @GetMapping("/batches/{id}")
+    public ResponseEntity<Batch> getBatch(@PathVariable("id") long batchId) throws BatchNotFoundException {
 
         Batch batch = batchService.getBatchById(batchId)
                 .orElseThrow(()-> new BatchNotFoundException("Batch not found"));
@@ -55,7 +52,6 @@ public class BatchController {
         return ResponseEntity.ok(batch);
     }
 
-    // Get the trainers batches
     @GetMapping("/trainer/batches")
     public ResponseEntity<List<Batch>> getTrainerBatches(Principal principal) {
         User user = userService

@@ -1,14 +1,15 @@
-package com.training.erp.model.request;
+package com.training.erp.model.response;
 
 import lombok.*;
 
 import java.sql.Timestamp;
 
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BatchRequestDto {
+@Getter
+@Setter
+@Builder
+public class BatchResponseDto {
     private String batchName;
     private String batchDescription;
     private Timestamp startDate;
