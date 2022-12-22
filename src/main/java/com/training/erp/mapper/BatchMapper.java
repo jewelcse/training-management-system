@@ -11,6 +11,7 @@ import java.util.List;
 public class BatchMapper {
 
     public BatchResponse batchToBatchResponseDto(Batch batch){
+        if (batch == null) return null;
         return BatchResponse.builder()
                 .id(batch.getId())
                 .batchName(batch.getBatchName())

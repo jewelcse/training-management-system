@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CourseRequestDto {
-    private String courseName;
-    private String courseDescription;
+public class RemoveTrainerRequest {
+    private long trainerId;
+    private long courseId;
 }

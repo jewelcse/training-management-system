@@ -11,6 +11,7 @@ import java.util.List;
 public class CourseMapper {
 
     public CourseResponse courseToCourseResponseDto(Course course){
+        if (course == null) return null;
         return CourseResponse.builder()
                 .id(course.getId())
                 .courseName(course.getCourseName())

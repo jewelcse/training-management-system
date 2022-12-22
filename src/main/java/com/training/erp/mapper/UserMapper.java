@@ -11,6 +11,7 @@ import java.util.Set;
 public class UserMapper {
 
     public UserDetails userToUserDetails(User user){
+        if (user == null) return null;
         return UserDetails.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())

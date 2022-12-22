@@ -11,6 +11,7 @@ import java.util.List;
 public class AssignmentMapper {
 
     public AssignmentResponse assignmentToAssignmentResponse(Assignment assignment){
+        if (assignment == null) return null;
         return AssignmentResponse.builder()
                 .id(assignment.getId())
                 .title(assignment.getTitle())
