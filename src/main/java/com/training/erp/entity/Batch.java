@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +30,9 @@ public class Batch {
     private Timestamp endDate;
 
 
-    @JsonBackReference
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {
+            CascadeType.PERSIST
+    })
     @JoinTable(
             name = "batch_users",
             joinColumns = @JoinColumn(
@@ -44,8 +46,9 @@ public class Batch {
 
 
 
-    @JsonBackReference
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {
+            CascadeType.PERSIST
+    })
     @JoinTable(
             name = "batch_courses",
             joinColumns = @JoinColumn(
@@ -55,7 +58,7 @@ public class Batch {
                     name = "course_id", referencedColumnName = "id"
             )
     )
-    Set<Course> courses = new HashSet<>();
+    List<Course> courses = new ArrayList<>();
 
 
 

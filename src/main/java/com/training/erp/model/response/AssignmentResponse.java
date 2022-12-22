@@ -8,11 +8,11 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AssignmentResponseDto {
+public class AssignmentResponse {
+    private long id;
     private String title;
     private int marks;
     private String filePath;
-    private long courseId;
-    private long userId;
-    private long batchId;
+    private String courseName;
+    private String batchName;
 }

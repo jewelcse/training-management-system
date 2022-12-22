@@ -1,6 +1,5 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.Batch;
 import com.training.erp.entity.Course;
 import com.training.erp.entity.Schedule;
 import com.training.erp.exception.BatchNotFoundException;
@@ -37,12 +36,12 @@ public class ScheduleController {
 
         // Get the batch, course, and also trainer
         //Batch batch = batchService.getBatchById(request.getBatch_id()).get();
-        Course course = courseService.getCourseByCourseId(request.getCourse_id());
+        //Course course = courseService.getCourseById(request.getCourse_id());
 
 
         // Start_date will be greater than all the same batch's previous schedules end_date
         // Get the all schedules by course
-        List<Schedule> batchesSchedule = scheduleService.getSchedulesByCourseAndBatch(course,null);
+        List<Schedule> batchesSchedule = scheduleService.getSchedulesByCourseAndBatch(null,null);
         // Check if the trainer/course is available that time or not
         if (isNotValidSchedule(batchesSchedule,request.getStart_date().getTime())){
             return ResponseEntity.ok("Invalid Schedule for Time: start_time"+request.getStart_date() + " end_time" + request.getEnd_date());

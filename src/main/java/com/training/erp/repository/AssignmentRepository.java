@@ -13,7 +13,6 @@ import java.util.List;
 
 @Repository
 public interface AssignmentRepository extends JpaRepository<Assignment,Long>, JpaSpecificationExecutor<Assignment> {
-    List<Assignment> findAllAssignmentByBatch(Batch batch);
     List<Assignment> findAllByCourse(Course course);
 
     //    @Query("SELECT trainer FROM Trainer trainer LEFT JOIN trainer.batches batch WHERE batch.id = ?1")

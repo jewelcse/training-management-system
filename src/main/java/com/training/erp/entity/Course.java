@@ -27,9 +27,14 @@ public class Course {
     private String courseDescription;
 
     @JsonBackReference
-    @OneToMany(cascade = CascadeType.ALL,
+    @OneToMany(cascade = CascadeType.PERSIST,
             orphanRemoval = true)
     @JoinColumn(name = "course_id")
     private List<Assignment> assignments;
+
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "trainer_id")
+    private User trainer;
 
 }

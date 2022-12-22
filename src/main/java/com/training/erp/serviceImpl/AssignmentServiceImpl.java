@@ -4,8 +4,7 @@ import com.training.erp.entity.*;
 import com.training.erp.exception.*;
 import com.training.erp.model.request.AssignmentRequestDto;
 import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
-import com.training.erp.model.response.AssignmentResponseDto;
-import com.training.erp.model.response.BatchResponseDto;
+import com.training.erp.model.response.AssignmentResponse;
 import com.training.erp.repository.*;
 import com.training.erp.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 
     @Override
-    public AssignmentResponseDto save(AssignmentRequestDto request, Principal principal){
+    public AssignmentResponse save(AssignmentRequestDto request, Principal principal){
 
         Optional<User> user = userRepository
                 .findByUsername(principal.getName());
@@ -53,20 +52,17 @@ public class AssignmentServiceImpl implements AssignmentService {
         Assignment assignment = Assignment.builder()
                 .title(request.getTitle())
                 .fileLocation(request.getFilePath())
-                .batch(batch.get())
                 .course(course.get())
-                .createdBy(user.get())
                 .totalMarks(request.getMarks())
                 .build();
         assignmentRepository.save(assignment);
 
-        return AssignmentResponseDto.builder()
+        return AssignmentResponse.builder()
                 .title(request.getTitle())
                 .marks(request.getMarks())
                 .filePath(request.getFilePath())
-                .batchId(batch.get().getId())
-                .courseId(course.get().getId())
-                .userId(user.get().getId())
+                .batchName(batch.get().getBatchName())
+                .courseName(course.get().getCourseName())
                 .build();
     }
 

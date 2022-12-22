@@ -8,6 +8,8 @@ import com.training.erp.exception.TrainerNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.CourseRequestDto;
 import com.training.erp.model.request.CourseUpdateRequest;
+import com.training.erp.model.response.CourseDetails;
+import com.training.erp.model.response.CourseResponse;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.service.BatchService;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -49,13 +50,11 @@ public class CourseController {
     }
 
 
-    // Get all courses
     @GetMapping("/courses")
-    public ResponseEntity<List<Course>> getCourses() {
+    public ResponseEntity<List<CourseResponse>> getCourses() {
         return ResponseEntity.ok(courseService.getCourses());
     }
 
-    // Get Trainers all course
     @GetMapping("/courses/trainer")
     public ResponseEntity<List<Course>> getCoursesByTrainerId(Principal principal) throws UserNotFoundException {
         User user = userService
@@ -80,39 +79,25 @@ public class CourseController {
         return ResponseEntity.ok(new MessageResponse("Course deleted successfully"));
     }
 
-    // Get single course by course ID
     @GetMapping("/courses/{id}")
-    public ResponseEntity<?> getCourse(@PathVariable("id") long courseId){
-        return ResponseEntity.ok(courseService.getCourseByCourseId(courseId));
+    public ResponseEntity<CourseDetails> getCourse(@PathVariable("id") long courseId){
+        return ResponseEntity.ok(courseService.getCourseById(courseId));
     }
 
-    // Get Course full profile by course ID
-    // Get The course details
-    // Get Assigned trainers details
-    // Get the list of assignments
-    @GetMapping("/courses/profile/{course-id}")
-    public ResponseEntity<?> getCourseProfileByCourseId(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
 
-        Course course = courseService.getCourseByCourseId(courseId);
-
-
-        List<Assignment> assignments = assignmentService.getAssignmentsByCourse(course.getId());
-
-        return ResponseEntity.ok(null);
-    }
-
-    // Assign trainer to course
     @GetMapping("/courses/{course-id}/trainers/{trainer-id}")
     public ResponseEntity<?> assignTrainerToCourse(@PathVariable("course-id") long courseId, @PathVariable("trainer-id") long trainerId) throws CourseNotFoundException, TrainerNotFoundException {
-        Course course = courseService.getCourseByCourseId(courseId);
+        //Course course = courseService.getCourseById(courseId);
 
         return ResponseEntity.ok(new MessageResponse("Trainer Assigned Success"));
     }
 
-    // Add course to batch
+    // todo: Add course to batch
+    // todo: Add trainees to batch
+    // todo: Add trainer to course
     @GetMapping("/courses/{course-id}/batches/{batch-id}")
     public ResponseEntity<?> addCourseToBatch(@PathVariable("course-id") long courseId, @PathVariable("batch-id") long batchId) throws CourseNotFoundException, BatchNotFoundException {
-       Course course = courseService.getCourseByCourseId(courseId);
+       //Course course = courseService.getCourseById(courseId);
 //        Batch batch = batchService.getBatchById(batchId)
 ////                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
 //        Set<Course> courses = batch.getCourses();
@@ -122,14 +107,6 @@ public class CourseController {
         return ResponseEntity.ok(new MessageResponse("Course Added Success"));
     }
 
-    // Get courses by batch ID
-    @GetMapping("/courses/batches/{batch-id}")
-    public ResponseEntity<List<Course>> getCoursesByBatchId(@PathVariable("batch-id") long batchId) throws BatchNotFoundException {
-//        Batch batch = batchService.getBatchById(batchId)
-//                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
-        //ResponseEntity.ok(courseService.getCoursesByBatch(batch));
-        return null;
-    }
 
     // Remove Trainer from Course
     @DeleteMapping("/courses/{course-id}/trainers/{trainer-id}")

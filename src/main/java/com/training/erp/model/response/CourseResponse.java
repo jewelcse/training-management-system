@@ -8,7 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CourseResponseDto {
+public class CourseResponse {
+    private long id;
     private String courseName;
     private String courseDescription;
 }

@@ -32,15 +32,6 @@ public class Assignment {
     @Column(name = "file_location")
     private String fileLocation;
 
-
-    @JsonBackReference
-    @ManyToOne
-    private User createdBy;
-
-    @JsonBackReference
-    @ManyToOne
-    private Batch batch;
-
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "id", referencedColumnName = "id")

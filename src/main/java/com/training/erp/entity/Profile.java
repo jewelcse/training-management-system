@@ -1,5 +1,6 @@
 package com.training.erp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -61,6 +62,7 @@ public class Profile {
     @Size(max = 32)
     private String zipCode;
 
-    @OneToOne(mappedBy = "profile")
+    @JsonBackReference
+    @OneToOne(fetch =FetchType.LAZY ,mappedBy = "profile")
     private User user;
 }
