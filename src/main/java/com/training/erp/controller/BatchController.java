@@ -1,15 +1,11 @@
 package com.training.erp.controller;
 
-import com.training.erp.model.request.BatchRequestDto;
-import com.training.erp.model.request.AssignUserRequest;
-import com.training.erp.model.request.RemoveUserRequest;
+import com.training.erp.model.request.*;
 import com.training.erp.model.response.BatchDetails;
 import com.training.erp.model.response.BatchResponse;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.service.BatchService;
-import com.training.erp.service.CourseService;
-import com.training.erp.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,23 +14,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class BatchController {
-    @Autowired
-    private BatchService batchService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private CourseService courseService;
+    private final BatchService batchService;
 
     @PostMapping("/batches")
-    public ResponseEntity<MessageResponse> create(@RequestBody BatchRequestDto request) {
-        if (batchService.existsByBatchName(request.getBatchName())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse(request.getBatchName() + " ALREADY EXIST!"));
-        }
-        batchService.save(request);
-        return ResponseEntity.ok(new MessageResponse("BATCH CREATED SUCCESS!"));
+    public ResponseEntity<BatchResponse> create(@RequestBody BatchCreateRequest request) {
+        return ResponseEntity.ok(batchService.save(request));
+    }
+    @PutMapping("/batches")
+    public ResponseEntity<BatchResponse> update(@RequestBody BatchUpdateRequest request) {
+        return ResponseEntity.ok(batchService.update(request));
     }
 
     @GetMapping("/batches")
@@ -46,32 +36,30 @@ public class BatchController {
     public ResponseEntity<BatchDetails> getBatch(@PathVariable("id") long id) {
         return ResponseEntity.ok(batchService.getBatchById(id));
     }
-
-    // Remove Course from Batch
-    @DeleteMapping("/batches/{bid}/courses/{cid}")
-    public ResponseEntity<?> removeCourseFromBatch(@PathVariable("batch-id") long batchId, @PathVariable("course-id") long courseId) {
-        //Batch batch = batchService.getBatchById(batchId);
-        //Course course = courseService.getCourseById(courseId);
-        //batchService.removeCourseFromBatch(batch,course);
-        return ResponseEntity.ok("Course Removed Successfully");
-    }
-
-
-
-
     @DeleteMapping("/batches/{id}")
     public ResponseEntity<MessageResponse> removeBatch(@PathVariable("id") long id) {
         batchService.deleteBatchById(id);
         return ResponseEntity.ok(new MessageResponse("Batch remove successfully"));
     }
 
-    @PostMapping("/batches/assign-user")
-    public ResponseEntity<MessageResponse> assignUser(@RequestBody AssignUserRequest request) {
+    @PostMapping("/batches/add-user")
+    public ResponseEntity<MessageResponse> addUser(@RequestBody AssignUserRequest request) {
         return new ResponseEntity<>(batchService.assignUserToBatch(request), HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/batches/remove-user")
-    public ResponseEntity<MessageResponse> removeUser(@RequestBody RemoveUserRequest request){
-        return new ResponseEntity<>(batchService.removeUserFromBatch(request),HttpStatus.ACCEPTED);
+    public ResponseEntity<MessageResponse> removeUser(@RequestBody RemoveUserRequest request) {
+        return new ResponseEntity<>(batchService.removeUserFromBatch(request), HttpStatus.ACCEPTED);
     }
+
+    @PostMapping("/batches/add-course")
+    public ResponseEntity<MessageResponse> addCourse(@RequestBody AddCourseRequest request){
+        return new ResponseEntity<>(batchService.addCourseToBatch(request), HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/batches/remove-course")
+    public ResponseEntity<MessageResponse> removeCourse(@RequestBody RemoveCourseRequest request){
+        return new ResponseEntity<>(batchService.removeCourseFromBatch(request), HttpStatus.ACCEPTED);
+    }
+
 }

@@ -2,42 +2,60 @@ package com.training.erp.serviceImpl;
 
 import com.training.erp.entity.*;
 import com.training.erp.exception.BatchNotFoundException;
+import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
-import com.training.erp.model.request.BatchRequestDto;
-import com.training.erp.model.request.AssignUserRequest;
-import com.training.erp.model.request.RemoveUserRequest;
+import com.training.erp.model.request.*;
 import com.training.erp.model.response.*;
 import com.training.erp.repository.*;
 import com.training.erp.service.BatchService;
 import com.training.erp.mapper.BatchMapper;
 import com.training.erp.mapper.CourseMapper;
 import com.training.erp.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 public class BatchServiceImpl implements BatchService {
-    @Autowired
-    private BatchRepository batchRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private BatchMapper batchMapper;
-    @Autowired
-    private CourseMapper courseMapper;
 
-    @Autowired
-    private UserMapper userManager;
+    private final BatchRepository batchRepository;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
+    private final BatchMapper batchMapper;
+    private final CourseMapper courseMapper;
+    private final UserMapper userManager;
+
     @Override
-    public BatchResponse save(BatchRequestDto request) {
+    public BatchResponse save(BatchCreateRequest request) {
+
+        if (existsByBatchName(request.getBatchName())) {
+            throw new RuntimeException("ALREADY EXISTS!");
+        }
+
         //batch
         Batch batch = new Batch();
         batch.setBatchName(request.getBatchName());
         batch.setBatchDescription(request.getBatchDescription());
         batch.setStartDate(request.getStartDate());
         batch.setEndDate(request.getEndDate());
+        //save
+        Batch response = batchRepository.save(batch);
+        //response
+        return batchMapper.batchToBatchResponseDto(response);
+    }
+
+    @Override
+    public BatchResponse update(BatchUpdateRequest request) {
+        //fetched
+        Batch batch = getBatch(request.getId());
+        //set
+        batch.setBatchName(request.getBatchName());
+        batch.setBatchDescription(request.getBatchDescription());
+        batch.setStartDate(request.getStartDate());
+        batch.setEndDate(request.getEndDate());
+
         //save
         Batch response = batchRepository.save(batch);
         //response
@@ -53,25 +71,49 @@ public class BatchServiceImpl implements BatchService {
     public MessageResponse assignUserToBatch(AssignUserRequest request) throws BatchNotFoundException, UserNotFoundException {
         Batch batch = getBatch(request.getBatchId());
         User user = getUser(request.getUserId());
-        Set<User> currentUsers = batch.getUsers();
-        currentUsers.add(user);
-        batch.setUsers(currentUsers);
+        Set<User> users = batch.getUsers();
+        users.add(user);
+        batch.setUsers(users);
         batchRepository.save(batch);
         return MessageResponse.builder()
                 .message("SUCCESS!")
                 .build();
 
     }
-
-
 
     @Override
     public MessageResponse removeUserFromBatch(RemoveUserRequest request) {
         Batch batch = getBatch(request.getBatchId());
         User user = getUser(request.getUserId());
-        Set<User> currentUsers = batch.getUsers();
-        currentUsers.remove(user);
-        batch.setUsers(currentUsers);
+        Set<User> users = batch.getUsers();
+        users.remove(user);
+        batch.setUsers(users);
+        batchRepository.save(batch);
+        return MessageResponse.builder()
+                .message("SUCCESS!")
+                .build();
+    }
+
+    @Override
+    public MessageResponse addCourseToBatch(AddCourseRequest request) {
+        Batch batch = getBatch(request.getBatchId());
+        Course course = getCourse(request.getCourseId());
+        List<Course> courses = batch.getCourses();
+        courses.add(course);
+        batch.setCourses(courses);
+        batchRepository.save(batch);
+        return MessageResponse.builder()
+                .message("SUCCESS!")
+                .build();
+    }
+
+    @Override
+    public MessageResponse removeCourseFromBatch(RemoveCourseRequest request) {
+        Batch batch = getBatch(request.getBatchId());
+        Course course = getCourse(request.getCourseId());
+        List<Course> courses = batch.getCourses();
+        courses.remove(course);
+        batch.setCourses(courses);
         batchRepository.save(batch);
         return MessageResponse.builder()
                 .message("SUCCESS!")
@@ -80,19 +122,16 @@ public class BatchServiceImpl implements BatchService {
 
 
     @Override
-    public BatchDetails getBatchById(long id){
-        Optional<Batch> batch = batchRepository.findById(id);
-        if(batch.isEmpty()){
-            throw new BatchNotFoundException("BATCH NOT FOUND!");
-        }
-        List<Course> courses = batch.get().getCourses();
-        Set<User> users = batch.get().getUsers();
+    public BatchDetails getBatchById(long id) {
+        Batch batch = getBatch(id);
+        List<Course> courses = batch.getCourses();
+        Set<User> users = batch.getUsers();
         return BatchDetails.builder()
-                .id(batch.get().getId())
-                .batchName(batch.get().getBatchName())
-                .batchDescription(batch.get().getBatchDescription())
-                .startDate(batch.get().getStartDate())
-                .endDate(batch.get().getEndDate())
+                .id(batch.getId())
+                .batchName(batch.getBatchName())
+                .batchDescription(batch.getBatchDescription())
+                .startDate(batch.getStartDate())
+                .endDate(batch.getEndDate())
                 .course(courseMapper.courseListToCourseResponseDtoList(courses))
                 .users(userManager.usersToUserDetailsList(users))
                 .build();
@@ -109,24 +148,27 @@ public class BatchServiceImpl implements BatchService {
         batchRepository.deleteById(batchId);
     }
 
-    private Batch getBatch(long id){
+    private Batch getBatch(long id) {
         Optional<Batch> batch = batchRepository.findById(id);
-        if (batch.isEmpty()){
+        if (batch.isEmpty()) {
             throw new BatchNotFoundException("BATCH NOT FOUND!");
         }
         return batch.get();
     }
 
-    private User getUser(long id){
+    private Course getCourse(long id) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isEmpty()) {
+            throw new CourseNotFoundException("COURSE NOT FOUND!");
+        }
+        return course.get();
+    }
+
+    private User getUser(long id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             throw new UserNotFoundException("USER NOT FOUND");
         }
         return user.get();
     }
-
-
-
-
-
 }

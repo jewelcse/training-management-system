@@ -1,6 +1,9 @@
 package com.training.erp.model.request;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
@@ -8,7 +11,8 @@ import java.sql.Timestamp;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BatchRequestDto {
+public class BatchUpdateRequest {
+    private long id;
     private String batchName;
     private String batchDescription;
     private Timestamp startDate;
