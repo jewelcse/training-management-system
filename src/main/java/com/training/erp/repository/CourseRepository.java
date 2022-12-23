@@ -10,6 +10,5 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<Course,Long> {
     boolean existsByCourseName(String courseName);
-//    List<Course> getAllCoursesByBatch(Long id);
 
 }

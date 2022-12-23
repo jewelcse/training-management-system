@@ -18,7 +18,6 @@ public class AssignmentSubmission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne
     @JoinColumn(name = "student_id")
     private User student;

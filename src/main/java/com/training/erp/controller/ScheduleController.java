@@ -19,12 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 public class ScheduleController {
-    @Autowired
-    private CourseService courseService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private BatchService batchService;
+
     @Autowired
     private ScheduleService scheduleService;
 

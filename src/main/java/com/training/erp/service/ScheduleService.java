@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface ScheduleService {
     void saveSchedule(Schedule schedule);
-    List<Schedule> getAllScheduleByBatch(Batch batch);
     List<Schedule> getAllSchedule();
     List<Schedule> getSchedulesByCourseAndBatch(Course course, Batch batch);
 }

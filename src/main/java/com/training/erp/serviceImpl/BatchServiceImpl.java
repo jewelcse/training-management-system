@@ -28,7 +28,7 @@ public class BatchServiceImpl implements BatchService {
     private final UserMapper userManager;
 
     @Override
-    public BatchResponse save(BatchCreateRequest request) {
+    public BatchCreateResponse save(BatchCreateRequest request) {
 
         if (existsByBatchName(request.getBatchName())) {
             throw new RuntimeException("ALREADY EXISTS!");
@@ -47,7 +47,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
-    public BatchResponse update(BatchUpdateRequest request) {
+    public BatchCreateResponse update(BatchUpdateRequest request) {
         //fetched
         Batch batch = getBatch(request.getId());
         //set
@@ -63,7 +63,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
-    public List<BatchResponse> getAllBatch() {
+    public List<BatchCreateResponse> getAllBatch() {
         return batchMapper.batchListToBatchResponseDtoList(batchRepository.findAll());
     }
 
@@ -122,11 +122,11 @@ public class BatchServiceImpl implements BatchService {
 
 
     @Override
-    public BatchDetails getBatchById(long id) {
+    public BatchDetailsResponse getBatchById(long id) {
         Batch batch = getBatch(id);
         List<Course> courses = batch.getCourses();
         Set<User> users = batch.getUsers();
-        return BatchDetails.builder()
+        return BatchDetailsResponse.builder()
                 .id(batch.getId())
                 .batchName(batch.getBatchName())
                 .batchDescription(batch.getBatchDescription())

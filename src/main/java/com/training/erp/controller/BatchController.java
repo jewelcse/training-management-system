@@ -1,8 +1,8 @@
 package com.training.erp.controller;
 
 import com.training.erp.model.request.*;
-import com.training.erp.model.response.BatchDetails;
-import com.training.erp.model.response.BatchResponse;
+import com.training.erp.model.response.BatchDetailsResponse;
+import com.training.erp.model.response.BatchCreateResponse;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.service.BatchService;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +19,21 @@ public class BatchController {
     private final BatchService batchService;
 
     @PostMapping("/batches")
-    public ResponseEntity<BatchResponse> create(@RequestBody BatchCreateRequest request) {
+    public ResponseEntity<BatchCreateResponse> create(@RequestBody BatchCreateRequest request) {
         return ResponseEntity.ok(batchService.save(request));
     }
     @PutMapping("/batches")
-    public ResponseEntity<BatchResponse> update(@RequestBody BatchUpdateRequest request) {
+    public ResponseEntity<BatchCreateResponse> update(@RequestBody BatchUpdateRequest request) {
         return ResponseEntity.ok(batchService.update(request));
     }
 
     @GetMapping("/batches")
-    public ResponseEntity<List<BatchResponse>> getBatches() {
+    public ResponseEntity<List<BatchCreateResponse>> getBatches() {
         return ResponseEntity.ok(batchService.getAllBatch());
     }
 
     @GetMapping("/batches/{id}")
-    public ResponseEntity<BatchDetails> getBatch(@PathVariable("id") long id) {
+    public ResponseEntity<BatchDetailsResponse> getBatch(@PathVariable("id") long id) {
         return ResponseEntity.ok(batchService.getBatchById(id));
     }
     @DeleteMapping("/batches/{id}")

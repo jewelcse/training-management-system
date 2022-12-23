@@ -5,6 +5,7 @@ import com.training.erp.repository.RoleRepository;
 import com.training.erp.repository.UserRepository;
 import com.training.erp.service.RoleService;
 import com.training.erp.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +13,12 @@ import java.util.List;
 
 
 @Service
+@AllArgsConstructor
 public class RoleServiceImpl implements RoleService {
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRepository userRepository;
+
+    private final RoleRepository roleRepository;
+
+    private final UserRepository userRepository;
     @Override
     public List<Role> getRoles() {
         return roleRepository.findAll();

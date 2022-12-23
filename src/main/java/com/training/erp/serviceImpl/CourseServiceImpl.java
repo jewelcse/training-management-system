@@ -12,7 +12,7 @@ import com.training.erp.model.request.AddTrainerToCourseRequest;
 import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
-import com.training.erp.model.response.CourseDetails;
+import com.training.erp.model.response.CourseDetailsResponse;
 import com.training.erp.model.response.CourseResponse;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.repository.AssignmentRepository;
@@ -65,10 +65,10 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseDetails getCourseById(long id) {
+    public CourseDetailsResponse getCourseById(long id) {
         Course course = getCourse(id);
         List<Assignment> assignments = assignmentRepository.findAllByCourse(course);
-        return CourseDetails.builder()
+        return CourseDetailsResponse.builder()
                 .id(course.getId())
                 .courseName(course.getCourseName())
                 .courseDescription(course.getCourseDescription())

@@ -4,6 +4,7 @@ package com.training.erp.controller;
 import com.training.erp.entity.*;
 import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private RoleService roleService;
+    private final RoleService roleService;
 
     // Get users by role
     @GetMapping("/users/by/role")

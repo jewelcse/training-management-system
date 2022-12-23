@@ -1,18 +1,11 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.AssignmentSubmission;
-import com.training.erp.entity.User;
-import com.training.erp.mapper.AssignmentMapper;
 import com.training.erp.model.request.AssignmentCreateRequest;
 import com.training.erp.model.request.AssignmentEvaluateRequest;
 import com.training.erp.model.response.*;
-import com.training.erp.repository.AssignmentSubmissionRepository;
 import com.training.erp.service.AssignmentService;
-import com.training.erp.service.UserService;
 import com.training.erp.util.FilesStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -6,15 +6,17 @@ import com.training.erp.entity.Course;
 import com.training.erp.entity.Schedule;
 import com.training.erp.repository.ScheduleRepository;
 import com.training.erp.service.ScheduleService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
-    @Autowired
-    private ScheduleRepository scheduleRepository;
+
+    private final ScheduleRepository scheduleRepository;
     @Override
     public void saveSchedule(Schedule schedule) {
         scheduleRepository.save(schedule);
@@ -24,14 +26,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.findAll();
     }
 
-
     @Override
     public List<Schedule> getSchedulesByCourseAndBatch(Course course, Batch batch) {
         return scheduleRepository.findAllByCourseAndBatch(course, batch);
     }
 
-    @Override
-    public List<Schedule> getAllScheduleByBatch(Batch batch) {
-        return scheduleRepository.findAllByBatch(batch);
-    }
 }

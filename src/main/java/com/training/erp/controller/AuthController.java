@@ -115,8 +115,7 @@ public class AuthController {
 
     @PutMapping("/users")
     public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
-        userService.updateUser(userUpdateRequest);
-        return ResponseEntity.ok("USER UPDATE SUCCESSFUL!");
+        return ResponseEntity.ok(userService.updateUser(userUpdateRequest));
     }
 
     @GetMapping("/users/{id}")

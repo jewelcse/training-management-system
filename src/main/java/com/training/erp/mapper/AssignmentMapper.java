@@ -1,7 +1,6 @@
 package com.training.erp.mapper;
 
 import com.training.erp.entity.Assignment;
-import com.training.erp.model.request.AssignmentCreateRequest;
 import com.training.erp.model.response.AssignmentResponse;
 import org.springframework.stereotype.Component;
 
@@ -21,18 +20,6 @@ public class AssignmentMapper {
                 .filePath(assignment.getFileLocation())
                 .build();
     }
-
-    public Assignment assignmentResponseToAssignment(AssignmentResponse response){
-        if(response == null) return null;
-        return Assignment.builder()
-                .id(response.getId())
-                .totalMarks(response.getMarks())
-                .fileLocation(response.getFilePath())
-                .title(response.getTitle())
-                .build();
-    }
-
-
     public List<AssignmentResponse> assignmentsToAssignmentsResponse(List<Assignment> assignments) {
         List<AssignmentResponse> assignmentResponses = new ArrayList<>();
         assignments.forEach( assignment -> assignmentResponses.add(assignmentToAssignmentResponse(assignment)));

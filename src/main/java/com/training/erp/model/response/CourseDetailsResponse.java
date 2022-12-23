@@ -1,6 +1,5 @@
 package com.training.erp.model.response;
 
-import com.training.erp.entity.User;
 import lombok.*;
 
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class CourseDetails {
+public class CourseDetailsResponse {
 
     private long id;
     private String courseName;

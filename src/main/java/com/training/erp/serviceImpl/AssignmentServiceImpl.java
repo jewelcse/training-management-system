@@ -10,6 +10,7 @@ import com.training.erp.model.response.*;
 import com.training.erp.repository.*;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.util.FilesStorageService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,29 +21,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class AssignmentServiceImpl implements AssignmentService {
-    @Autowired
-    private AssignmentRepository assignmentRepository;
-    @Autowired
-    private AssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private CourseRepository courseRepository;
 
+    private final AssignmentRepository assignmentRepository;
 
-    @Autowired
-    private AssignmentMapper assignmentMapper;
+    private final AssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private FilesStorageService filesStorageService;
+    private final CourseRepository courseRepository;
 
-    @Value("${fileLink}")
-    private String link;
+    private final AssignmentMapper assignmentMapper;
 
+    private final UserMapper userMapper;
+
+    private final FilesStorageService filesStorageService;
 
     @Override
     public AssignmentResponse save(AssignmentCreateRequest request) {
@@ -151,7 +145,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 = traineesAssignmentSubmissionRepository.findById(request.getSubmissionId())
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
         evaluatedAssignment.setObtainedMarks(request.getMarks());
-        AssignmentSubmission submission =  traineesAssignmentSubmissionRepository.save(evaluatedAssignment);
+        AssignmentSubmission submission = traineesAssignmentSubmissionRepository.save(evaluatedAssignment);
         return UpdatedSubmissionResponse.builder()
                 .submissionId(submission.getId())
                 .totalMarks(submission.getAssignment().getTotalMarks())
@@ -186,7 +180,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
             // Save the pdf/ image/ docs file to upload folder
             String filePath = filesStorageService.saveFile(file);
-            submission.setFileLocation(link + filePath);
+            submission.setFileLocation("http://localhost:8090/api/v1/assignments/trainees/submissions/file/" + filePath);
             submission.setObtainedMarks(0);
             submission.setAssignment(assignment.get());
             submission.setStudent(student.get());
@@ -207,15 +201,15 @@ public class AssignmentServiceImpl implements AssignmentService {
         List<AssignmentSubmission> submissions = traineesAssignmentSubmissionRepository.findAllByStudent(user.get());
         List<SubmissionResponse> responses = new ArrayList<>();
 
-        System.out.println("submission size "+submissions.size());
-        submissions.forEach( submission -> responses.add(SubmissionResponse.builder()
+        System.out.println("submission size " + submissions.size());
+        submissions.forEach(submission -> responses.add(SubmissionResponse.builder()
 
-                        .assignmentTitle(submission.getAssignment().getTitle())
-                        .courseName(submission.getAssignment().getCourse().getCourseName())
-                        .submissionId(submission.getId())
-                        .fileLocation(submission.getFileLocation())
-                        .obtainedMarks(submission.getObtainedMarks())
-                        .totalMarks(submission.getAssignment().getTotalMarks())
+                .assignmentTitle(submission.getAssignment().getTitle())
+                .courseName(submission.getAssignment().getCourse().getCourseName())
+                .submissionId(submission.getId())
+                .fileLocation(submission.getFileLocation())
+                .obtainedMarks(submission.getObtainedMarks())
+                .totalMarks(submission.getAssignment().getTotalMarks())
                 .build()));
 
         return responses;

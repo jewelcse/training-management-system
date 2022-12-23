@@ -11,6 +11,7 @@ import com.training.erp.repository.*;
 import com.training.erp.service.UserService;
 import com.training.erp.util.EmailService;
 import com.training.erp.util.UtilMethods;
+import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,36 +30,34 @@ import static com.training.erp.util.UtilProperties.*;
 
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private ScheduleRepository scheduleRepository;
-    @Autowired
-    private UserVerificationCenterRepository userVerificationCenterRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder encoder;
-    @Autowired
+    private final UserVerificationCenterRepository userVerificationCenterRepository;
+
+    private final BCryptPasswordEncoder encoder;
     EmailService emailService;
 
     @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
 
     }
+
     @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
 
     }
+
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
@@ -125,31 +124,26 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
-
-
     @Override
     public List<User> getAllUser() {
         return userRepository.findAll();
     }
-    @Override
-    public List<User> getAllUserByRole(ERole role) {
-        return userRepository.findAllUsersByRole(role);
-    }
+
     @Override
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
+
     @Transactional
     @Override
     public User updateUser(UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userUpdateRequest.getId())
-                .orElseThrow(()-> new UsernameNotFoundException("user not found for id: "+userUpdateRequest.getId()));
+                .orElseThrow(() -> new UsernameNotFoundException("user not found for id: " + userUpdateRequest.getId()));
         user.setId(user.getId());
         user.setEmail(userUpdateRequest.getEmail());
         Set<Role> roles = new HashSet<>();
         Role role = roleRepository.findByName(ERole.valueOf(userUpdateRequest.getRole()))
-                        .orElseThrow(()-> new RuntimeException("Role not found for "+ userUpdateRequest.getRole()));
+                .orElseThrow(() -> new RuntimeException("Role not found for " + userUpdateRequest.getRole()));
         roles.add(role);
         user.setRoles(roles);
         return userRepository.save(user);
@@ -186,20 +180,14 @@ public class UserServiceImpl implements UserService {
     public UserVerificationCenter resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException {
         String code = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
         userVerificationCenter.setVerificationCode(code);
-        userVerificationCenter.setMaxLimit(userVerificationCenter.getMaxLimit()-1);
+        userVerificationCenter.setMaxLimit(userVerificationCenter.getMaxLimit() - 1);
         userVerificationCenter.setUser(user);
         userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
         userVerificationCenterRepository.save(userVerificationCenter);
-        emailService.sendVerificationEmail(user,code);
+        emailService.sendVerificationEmail(user, code);
         return userVerificationCenter;
     }
 
-
-
-    @Override
-    public List<Schedule> getAllScheduleByCourse(Course course) {
-        return scheduleRepository.findAllByCourse(course);
-    }
     @Override
     public User resetPassword(User user) {
         return userRepository.save(user);
@@ -210,7 +198,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    private void sendEmail(){
+    private void sendEmail() {
         //        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
 //        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
 //        userVerificationCenter.setUser(user);
@@ -220,6 +208,7 @@ public class UserServiceImpl implements UserService {
 //        userVerificationCenterRepository.save(userVerificationCenter);
 //        emailService.sendVerificationEmail(user,randomCode);
     }
+
     private Set<Role> checkRoles(String stringRole) throws RoleNotFoundException {
         Set<Role> roles = new HashSet<>();
         if (stringRole == null) {

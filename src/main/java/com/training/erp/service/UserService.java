@@ -22,15 +22,13 @@ public interface UserService {
     UserAddResponse save(UserAddRequest request);
 
     List<User> getAllUser();
-    List<User> getAllUserByRole(ERole role);
     void deleteUserById(Long id);
     User updateUser(UserUpdateRequest userUpdateRequest);
     void activateDeactivateUserAccount(User user);
-    Optional<User> existsByUserId(long trainerAccountId);
-    Optional<User> findById(long userId);
+    Optional<User> existsByUserId(long id);
+    Optional<User> findById(long id);
     UserVerificationCenter verifyAccount(UserVerificationCenter userVerificationCenter);
     UserVerificationCenter resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException;
-    List<Schedule> getAllScheduleByCourse(Course course);
     User resetPassword(User user);
     User lockedUserAccount(User user);
 }
