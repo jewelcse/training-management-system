@@ -1,22 +1,25 @@
 package com.training.erp.service;
 
-import com.training.erp.entity.Assignment;
-import com.training.erp.entity.AssignmentSubmission;
-import com.training.erp.model.request.AssignmentRequestDto;
-import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
+import com.training.erp.model.request.AssignmentCreateRequest;
+import com.training.erp.model.request.AssignmentEvaluateRequest;
 import com.training.erp.model.response.AssignmentResponse;
+import com.training.erp.model.response.AssignmentSubmissionResponse;
+import com.training.erp.model.response.SubmissionResponse;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.util.List;
 
 public interface AssignmentService {
-    AssignmentResponse save(AssignmentRequestDto assignmentRequestDto, Principal principal);
-    List<Assignment> getAssignments();
-    List<Assignment> getAssignments(Principal principal);
-    List<Assignment> getAssignmentsByCourse(long courseId);
-    Assignment getAssignmentByAssignmentId(long assignmentId);
-    void deleteAssignmentByAssignmentId(long assignmentId);
-    List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId);
-    AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId);
-    void updateSubmission(AssignmentSubmissionUpdateRequest submission);
+    AssignmentResponse save(AssignmentCreateRequest request);
+    List<AssignmentResponse> getAssignments();
+    List<AssignmentResponse> getAssignmentsByCourse(long courseId);
+    AssignmentResponse getAssignmentById(long assignmentId);
+    void deleteAssignmentById(long id);
+    List<AssignmentSubmissionResponse> getAssignmentSubmissionByAssignmentId(long assignmentId);
+    AssignmentSubmissionResponse getTraineesSubmissionBySubmissionId(long submissionId);
+    void updateSubmission(AssignmentEvaluateRequest request);
+
+    boolean submitAssignment(MultipartFile file, long aid, long sid);
+
+    List<SubmissionResponse> getSubmissionsByStudentUsername(String username);
 }

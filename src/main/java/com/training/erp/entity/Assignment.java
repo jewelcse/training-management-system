@@ -27,14 +27,16 @@ public class Assignment {
     private String title;
 
     @Column(name = "marks")
-    private int totalMarks;
+    private double totalMarks;
 
     @Column(name = "file_location")
     private String fileLocation;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "id", referencedColumnName = "id")
+    @JsonBackReference
+    @OneToMany(fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST,
+            orphanRemoval = true)
+    @JoinColumn(name = "assignment_id")
     private Set<AssignmentSubmission> submissions = new HashSet<>();
 
     @JsonBackReference

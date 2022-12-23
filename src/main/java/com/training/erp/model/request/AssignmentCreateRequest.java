@@ -7,10 +7,9 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentRequestDto {
+public class AssignmentCreateRequest {
     private String title;
     private int marks;
     private String filePath;
     private long courseId;
-    private long batchId;
 }

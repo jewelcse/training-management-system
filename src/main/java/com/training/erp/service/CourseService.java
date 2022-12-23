@@ -14,13 +14,19 @@ import java.util.List;
 
 public interface CourseService {
     CourseResponse save(CourseCreateRequest request);
+
     CourseResponse update(CourseUpdateRequest request);
+
     boolean existsByCourse(String course_name);
+
     List<CourseResponse> getCourses();
+
     void deleteCourseById(long courseId);
+
     CourseDetails getCourseById(long id);
 
     MessageResponse addTrainerToCourse(AddTrainerRequest request);
+
     MessageResponse removeTrainerFromCourse(RemoveTrainerRequest request);
 
 }

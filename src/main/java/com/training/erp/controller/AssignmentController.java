@@ -1,17 +1,19 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.Assignment;
 import com.training.erp.entity.AssignmentSubmission;
 import com.training.erp.entity.User;
-import com.training.erp.exception.*;
-import com.training.erp.model.request.AssignmentRequestDto;
-import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
+import com.training.erp.mapper.AssignmentMapper;
+import com.training.erp.model.request.AssignmentCreateRequest;
+import com.training.erp.model.request.AssignmentEvaluateRequest;
+import com.training.erp.model.response.AssignmentResponse;
+import com.training.erp.model.response.AssignmentSubmissionResponse;
 import com.training.erp.model.response.MessageResponse;
-import com.training.erp.model.response.TraineeAssignmentResponse;
+import com.training.erp.model.response.SubmissionResponse;
 import com.training.erp.repository.AssignmentSubmissionRepository;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.service.UserService;
 import com.training.erp.util.FilesStorageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -19,7 +21,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,63 +29,44 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
-public class
-AssignmentController {
-    @Autowired
-    private AssignmentService assignmentService;
-    @Autowired
-    private FilesStorageService filesStorageService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private AssignmentSubmissionRepository traineesAssignmentSubmissionRepository;
-    @Value("${fileLink}")
-    private String link;
-    // Create new assignment
-    //@Secured("ROLE_TRAINER")
+@RequiredArgsConstructor
+public class AssignmentController {
+
+    private final AssignmentService assignmentService;
+
+    private final FilesStorageService filesStorageService;
+
     @PostMapping("/assignments")
-    public ResponseEntity<MessageResponse> create(@RequestBody AssignmentRequestDto assignmentRequestDto, Principal principal) throws BatchNotFoundException, UserNotFoundException, CourseNotFoundException {
-        assignmentService.save(assignmentRequestDto,principal);
-        return new ResponseEntity<>(new MessageResponse("Assignment Created Successfully"), HttpStatus.CREATED);
+    public ResponseEntity<AssignmentResponse> create(@RequestBody AssignmentCreateRequest request) {
+        return new ResponseEntity<>(assignmentService.save(request), HttpStatus.CREATED);
     }
-    // Get all assignment
+
     @GetMapping("/assignments")
-    public ResponseEntity<List<Assignment>> getAssignments(){
+    public ResponseEntity<List<AssignmentResponse>> getAll() {
         return ResponseEntity.ok(assignmentService.getAssignments());
     }
-    // Get all assignments by trainer
-    @Secured("ROLE_TRAINER")
-    @GetMapping("/assignments/trainer")
-    public ResponseEntity<List<Assignment>> getAssignmentsByUser(Principal principal) {
-        return ResponseEntity.ok(assignmentService.getAssignments(principal));
-    }
-    // Gets assignment by course ID
-    @GetMapping("/assignments/course/{course-id}")
-    public ResponseEntity<List<Assignment>> getAssignmentsByCourse(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
-        return ResponseEntity.ok(assignmentService.getAssignmentsByCourse(courseId));
+
+    @GetMapping("/assignments/course/{id}")
+    public ResponseEntity<List<AssignmentResponse>> getAssignmentsByCourse(@PathVariable("id") long id) {
+        return ResponseEntity.ok(assignmentService.getAssignmentsByCourse(id));
     }
 
-    // Get assignment by assignment ID
-    @GetMapping("/assignments/{assignment-id}")
-    public ResponseEntity<Assignment> getAssignmentByAssignmentId(@PathVariable("assignment-id") long assignmentId) throws AssignmentNotFoundException {
-        return ResponseEntity.ok(assignmentService.getAssignmentByAssignmentId(assignmentId));
+    @GetMapping("/assignments/{id}")
+    public ResponseEntity<AssignmentResponse> getAssignment(@PathVariable("id") long id) {
+        return ResponseEntity.ok(assignmentService.getAssignmentById(id));
     }
 
-    // Get list of trainees assignment submissions by assignment ID
-    @GetMapping("/assignments/submissions/{assignment-id}")
-    public ResponseEntity<TraineeAssignmentResponse> getAssignmentSubmissionByAssignmentId(@PathVariable("assignment-id") long assignmentId) throws AssignmentNotFoundException {
-        Assignment assignment = assignmentService.getAssignmentByAssignmentId(assignmentId);
-        return ResponseEntity.ok(new TraineeAssignmentResponse(assignment,assignmentService.getAssignmentSubmissionByAssignmentId(assignmentId)));
+    @GetMapping("/assignments/{id}/submissions")
+    public ResponseEntity<?> getAssignmentSubmissionsByAssignmentId(@PathVariable("id") long assignmentId) {
+        return ResponseEntity.ok(assignmentService.getAssignmentSubmissionByAssignmentId(assignmentId));
     }
 
-    // Get trainees single submission by assignment submission ID
-    @GetMapping("/assignments/trainees/submissions/{submission-id}")
-    public ResponseEntity<AssignmentSubmission> getUserSubmissionBySubmissionId(@PathVariable("submission-id") long submissionId) throws TraineesAssignmentSubmissionNotFoundException {
+    @GetMapping("/assignments/trainees/submissions/{id}")
+    public ResponseEntity<AssignmentSubmissionResponse> getStudentSubmissionBySubmissionId(@PathVariable("id") long submissionId) {
         return ResponseEntity.ok(assignmentService.getTraineesSubmissionBySubmissionId(submissionId));
     }
 
@@ -92,77 +74,38 @@ AssignmentController {
     // Trainer update the trainees' assignment
     // Trainer can evaluate the trainees' submission
     // Added marks for the submitted assignment
-    @PostMapping("/assignments/trainees/submissions")
-    public ResponseEntity<?> updateUserSubmission(@RequestBody AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException {
-        assignmentService.updateSubmission(submission);
+    @PostMapping("/assignments/evaluate")
+    public ResponseEntity<?> evaluateAssignment(@RequestBody AssignmentEvaluateRequest request) {
+        assignmentService.updateSubmission(request);
         return ResponseEntity.ok("Updated");
     }
 
     // Delete assignment by assignment ID
-    @DeleteMapping("/assignments/{assignment-id}")
-    public ResponseEntity<?> deleteAssignmentByAssignmentId(@PathVariable("assignment-id") long assignmentId) throws AssignmentNotFoundException {
-        assignmentService.deleteAssignmentByAssignmentId(assignmentId);
+    @DeleteMapping("/assignments/{id}")
+    public ResponseEntity<?> remove(@PathVariable("id") long id) {
+        assignmentService.deleteAssignmentById(id);
         return ResponseEntity.ok(new MessageResponse("Assignment deleted successfully"));
     }
 
-    // Get all trainees submissions in a single list
-    @GetMapping("/assignments/trainees")
-    public ResponseEntity<List<AssignmentSubmission>> getSubmissionsByUser(){
+    @GetMapping("/assignments/my/submissions")
+    public ResponseEntity<List<SubmissionResponse>> studentSubmissions() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username="";
+        String username = "";
         if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
+            username = ((UserDetails) principal).getUsername();
+            System.out.println("in controller username: " + username);
         }
-        // Check the user is valid or not
-        // Find the user by username
-        User user = userService.findByUsername(username)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found for username "));
-        // Find the trainee profile by user
-//        Trainee trainee = userService.getTraineeProfile(user);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(assignmentService.getSubmissionsByStudentUsername(username));
 
     }
-    // Submit the assignment by trainee
-    @PostMapping("/assignments/trainees")
-    public ResponseEntity<?> uploadAssignment(@RequestParam("file") MultipartFile file,@RequestParam("assignmentId") long assignmentId){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username="";
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        }
-        // Find the user by username
-        User user = userService.findByUsername(username)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found for username "));
 
-        Assignment assignment = assignmentService.getAssignmentByAssignmentId(assignmentId);
-        boolean doesSubmitted
-                = traineesAssignmentSubmissionRepository.existsById(assignmentId);
-        // Check the assignment is submitted or not
-        if (doesSubmitted){
-            return ResponseEntity
-                    .badRequest()
-                    .body("Already Submitted!");
-        }
-        // If not then,
-        // Create a new object of the submission entity
-        AssignmentSubmission traineesAssignmentSubmission
-                = new AssignmentSubmission();
-        String message = "";
-        try {
-            // Save the pdf/ image/ docs file to upload folder
-            String filePath = filesStorageService.saveFile(file);
-            message = "Submitted the Assignment successfully";
-            traineesAssignmentSubmission.setFileLocation(link+filePath);
-            traineesAssignmentSubmission.setObtainedMarks(0);
-            traineesAssignmentSubmission.setAssignment(assignment);
-            traineesAssignmentSubmission.setUser(user);
-            traineesAssignmentSubmissionRepository.save(traineesAssignmentSubmission);
-            return ResponseEntity.status(HttpStatus.OK).body(message);
-        } catch (Exception e) {
-            message = "Could not upload the Assignment: " + file.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
-        }
+    @PostMapping("/assignments/submit")
+    public ResponseEntity<?> submit(@RequestParam("file") MultipartFile file, @RequestParam("assignmentId") long assignmentId, @RequestParam("studentId") long studentId) {
+        boolean submitted = assignmentService.submitAssignment(file, assignmentId, studentId);
+        if (submitted) return new ResponseEntity<>("Assignment Uploaded success", HttpStatus.CREATED);
+        return new ResponseEntity<>("Assignment Uploaded failed", HttpStatus.BAD_REQUEST);
     }
+
 
     // Get the single downloadable assignment submissions
     // As a submitted form like [pdf,img,docs] etc
@@ -178,16 +121,14 @@ AssignmentController {
         }
 
         // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
+        if (contentType == null) {
             contentType = "application/octet-stream";
         }
 
         //System.out.println(resource.getFilename() + " resoyrce");
-        return ResponseEntity.ok() .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType)).header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"").body(resource);
 
     }
-
 
 
 }

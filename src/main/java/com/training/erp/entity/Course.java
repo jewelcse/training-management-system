@@ -27,7 +27,8 @@ public class Course {
     private String courseDescription;
 
     @JsonBackReference
-    @OneToMany(cascade = CascadeType.PERSIST,
+    @OneToMany(fetch = FetchType.EAGER,
+            cascade = CascadeType.PERSIST,
             orphanRemoval = true)
     @JoinColumn(name = "course_id")
     private List<Assignment> assignments;

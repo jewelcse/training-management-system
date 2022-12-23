@@ -2,16 +2,23 @@ package com.training.erp.serviceImpl;
 
 import com.training.erp.entity.*;
 import com.training.erp.exception.*;
-import com.training.erp.model.request.AssignmentRequestDto;
-import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
+import com.training.erp.mapper.AssignmentMapper;
+import com.training.erp.mapper.UserMapper;
+import com.training.erp.model.request.AssignmentCreateRequest;
+import com.training.erp.model.request.AssignmentEvaluateRequest;
 import com.training.erp.model.response.AssignmentResponse;
+import com.training.erp.model.response.AssignmentSubmissionResponse;
+import com.training.erp.model.response.SubmissionResponse;
+import com.training.erp.model.response.UserProfile;
 import com.training.erp.repository.*;
 import com.training.erp.service.AssignmentService;
+import com.training.erp.util.FilesStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,28 +33,27 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Autowired
     private CourseRepository courseRepository;
 
+
     @Autowired
-    private BatchRepository batchRepository;
+    private AssignmentMapper assignmentMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private FilesStorageService filesStorageService;
+
+    @Value("${fileLink}")
+    private String link;
 
 
     @Override
-    public AssignmentResponse save(AssignmentRequestDto request, Principal principal){
-
-        Optional<User> user = userRepository
-                .findByUsername(principal.getName());
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("USER NOT FOUND");
-        }
-        Optional<Batch> batch = batchRepository.findById(request.getBatchId());
-        if (batch.isEmpty()) {
-            throw new BatchNotFoundException("BATCH NOT FOUND");
-        }
+    public AssignmentResponse save(AssignmentCreateRequest request) {
 
         Optional<Course> course = courseRepository.findById(request.getCourseId());
         if (course.isEmpty()) {
             throw new CourseNotFoundException("COURSE NOT FOUND");
         }
-
 
         Assignment assignment = Assignment.builder()
                 .title(request.getTitle())
@@ -55,72 +61,162 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .course(course.get())
                 .totalMarks(request.getMarks())
                 .build();
-        assignmentRepository.save(assignment);
+        Assignment response = assignmentRepository.save(assignment);
 
-        return AssignmentResponse.builder()
-                .title(request.getTitle())
-                .marks(request.getMarks())
-                .filePath(request.getFilePath())
-                .batchName(batch.get().getBatchName())
-                .courseName(course.get().getCourseName())
-                .build();
+        return assignmentMapper.assignmentToAssignmentResponse(response);
     }
 
     @Override
-    public List<Assignment> getAssignments() {
-        return assignmentRepository.findAll();
+    public List<AssignmentResponse> getAssignments() {
+        return assignmentMapper.assignmentsToAssignmentsResponse(assignmentRepository.findAll());
     }
 
     @Override
-    public List<Assignment> getAssignments(Principal principal) {
-        User user = userRepository
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-
-        return null;
-    }
-
-    @Override
-    public List<Assignment> getAssignmentsByCourse(long courseId){
+    public List<AssignmentResponse> getAssignmentsByCourse(long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException("Course not found"));
-        return assignmentRepository.findAllByCourse(course);
+        return assignmentMapper.assignmentsToAssignmentsResponse(assignmentRepository.findAllByCourse(course));
     }
 
     @Override
-    public Assignment getAssignmentByAssignmentId(long assignmentId){
-        return assignmentRepository.findById(assignmentId)
+    public AssignmentResponse getAssignmentById(long assignmentId) {
+        Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
+        return assignmentMapper.assignmentToAssignmentResponse(assignment);
     }
 
     @Override
-    public void deleteAssignmentByAssignmentId(long assignmentId){
+    public void deleteAssignmentById(long assignmentId) {
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
         assignmentRepository.deleteById(assignment.getId());
     }
 
     @Override
-    public List<AssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId){
+    public List<AssignmentSubmissionResponse> getAssignmentSubmissionByAssignmentId(long assignmentId) {
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
-        return traineesAssignmentSubmissionRepository.findAllByAssignment(assignment);
+
+        List<AssignmentSubmission> submissions = traineesAssignmentSubmissionRepository.findAllByAssignment(assignment);
+
+        List<AssignmentSubmissionResponse> responses = new ArrayList<>();
+
+        submissions.forEach(submission -> {
+            responses.add(AssignmentSubmissionResponse.builder()
+                    .assignmentTitle(submission.getAssignment().getTitle())
+                    .totalMarks(submission.getAssignment().getTotalMarks())
+                    .submissionId(submission.getId())
+                    .obtainedMarks(submission.getObtainedMarks())
+                    .student(userMapper.profileToUserProfile(submission.getStudent().getProfile()))
+                    .fileLocation(submission.getFileLocation())
+                    .build());
+        });
+
+        return responses;
     }
 
     @Override
-    public AssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) {
-        return traineesAssignmentSubmissionRepository.findById(submissionId)
+    public AssignmentSubmissionResponse getTraineesSubmissionBySubmissionId(long id) {
+        AssignmentSubmission submission = traineesAssignmentSubmissionRepository.findById(id)
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
+
+
+        UserProfile profile = UserProfile.builder()
+                .firstName(submission.getStudent().getProfile().getFirstName())
+                .lastName(submission.getStudent().getProfile().getLastName())
+                .username(submission.getStudent().getUsername())
+                .address1(submission.getStudent().getProfile().getAddress1())
+                .address2(submission.getStudent().getProfile().getAddress2())
+                .city(submission.getStudent().getProfile().getCity())
+                .street(submission.getStudent().getProfile().getStreet())
+                .city(submission.getStudent().getProfile().getCity())
+                .dateOfBirth(submission.getStudent().getProfile().getDateOfBirth())
+                .gender(submission.getStudent().getProfile().getGender())
+                .country(submission.getStudent().getProfile().getCountry())
+                .zipCode(submission.getStudent().getProfile().getZipCode())
+                .state(submission.getStudent().getProfile().getState())
+                .phoneNumber(submission.getStudent().getProfile().getPhoneNumber())
+                .build();
+
+        return AssignmentSubmissionResponse.builder()
+                .submissionId(submission.getId())
+                .assignmentTitle(submission.getAssignment().getTitle())
+                .totalMarks(submission.getAssignment().getTotalMarks())
+                .obtainedMarks(submission.getObtainedMarks())
+                .fileLocation(submission.getFileLocation())
+                .student(profile)
+                .build();
     }
 
     @Override
-    public void updateSubmission(AssignmentSubmissionUpdateRequest submission){
-        AssignmentSubmission traineesAssignmentSubmissions
-                = traineesAssignmentSubmissionRepository.findById(submission.getSubmissionId())
+    public void updateSubmission(AssignmentEvaluateRequest request) {
+        AssignmentSubmission evaluatedAssignment
+                = traineesAssignmentSubmissionRepository.findById(request.getSubmissionId())
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
-        traineesAssignmentSubmissions.setObtainedMarks(submission.getMarks());
-        traineesAssignmentSubmissionRepository.save(traineesAssignmentSubmissions);
+        evaluatedAssignment.setObtainedMarks(request.getMarks());
+        traineesAssignmentSubmissionRepository.save(evaluatedAssignment);
+    }
+
+    @Override
+    public boolean submitAssignment(MultipartFile file, long aid, long sid) {
+
+        Optional<User> student = userRepository.findById(sid);
+        if (student.isEmpty()) {
+            throw new UserNotFoundException("USER NOT FOUND!");
+        }
+
+        System.out.println("user in service: " + student.get().getId());
+
+        Optional<Assignment> assignment = assignmentRepository.findById(aid);
+        if (assignment.isEmpty()) {
+            throw new AssignmentNotFoundException("ASSIGNMENT NOT FOUND!");
+        }
+        System.out.println("assignment in service: " + assignment.get().getId());
+
+        boolean doesSubmitted
+                = traineesAssignmentSubmissionRepository.existsByStudentAndAssignment(student.get(), assignment.get());
+
+        System.out.println("submitted: " + doesSubmitted);
+
+
+        if (!doesSubmitted) {
+            AssignmentSubmission submission = new AssignmentSubmission();
+
+            // Save the pdf/ image/ docs file to upload folder
+            String filePath = filesStorageService.saveFile(file);
+            submission.setFileLocation(link + filePath);
+            submission.setObtainedMarks(0);
+            submission.setAssignment(assignment.get());
+            submission.setStudent(student.get());
+            traineesAssignmentSubmissionRepository.save(submission);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public List<SubmissionResponse> getSubmissionsByStudentUsername(String username) {
+
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("USER NOT FOUND!");
+        }
+
+        List<AssignmentSubmission> submissions = traineesAssignmentSubmissionRepository.findAllByStudent(user.get());
+        List<SubmissionResponse> responses = new ArrayList<>();
+
+        System.out.println("submission size "+submissions.size());
+        submissions.forEach( submission -> responses.add(SubmissionResponse.builder()
+
+                        .assignmentTitle(submission.getAssignment().getTitle())
+                        .courseName(submission.getAssignment().getCourse().getCourseName())
+                        .submissionId(submission.getId())
+                        .fileLocation(submission.getFileLocation())
+                        .obtainedMarks(submission.getObtainedMarks())
+                        .totalMarks(submission.getAssignment().getTotalMarks())
+                .build()));
+
+        return responses;
     }
 
 }

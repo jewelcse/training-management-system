@@ -1,7 +1,9 @@
 package com.training.erp.mapper;
 
+import com.training.erp.entity.Profile;
 import com.training.erp.entity.User;
 import com.training.erp.model.response.UserDetails;
+import com.training.erp.model.response.UserProfile;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -17,6 +19,25 @@ public class UserMapper {
                 .email(user.getEmail())
                 .isEnabled(user.isEnabled())
                 .isNonLocked(user.isNonLocked())
+                .build();
+    }
+
+    public UserProfile profileToUserProfile(Profile profile){
+        if (profile == null) return null;
+        return UserProfile.builder()
+                .firstName(profile.getFirstName())
+                .lastName(profile.getLastName())
+                .address1(profile.getAddress1())
+                .address2(profile.getAddress2())
+                .city(profile.getCity())
+                .street(profile.getStreet())
+                .city(profile.getCity())
+                .dateOfBirth(profile.getDateOfBirth())
+                .gender(profile.getGender())
+                .country(profile.getCountry())
+                .zipCode(profile.getZipCode())
+                .state(profile.getState())
+                .phoneNumber(profile.getPhoneNumber())
                 .build();
     }
 

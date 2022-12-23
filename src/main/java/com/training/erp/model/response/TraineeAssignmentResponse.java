@@ -11,6 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 public class TraineeAssignmentResponse {
-    private Assignment assignment;
-    private List<AssignmentSubmission> submissions;
+    private AssignmentResponse assignment;
+    private List<AssignmentSubmissionResponse> submissions;
 }

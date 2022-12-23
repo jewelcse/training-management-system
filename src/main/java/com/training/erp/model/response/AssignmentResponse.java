@@ -11,8 +11,7 @@ import lombok.*;
 public class AssignmentResponse {
     private long id;
     private String title;
-    private int marks;
+    private double marks;
     private String filePath;
     private String courseName;
-    private String batchName;
 }

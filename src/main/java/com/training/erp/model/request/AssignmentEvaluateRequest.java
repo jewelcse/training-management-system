@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentSubmissionUpdateRequest {
+public class AssignmentEvaluateRequest {
     private long submissionId;
     private int marks;
 }

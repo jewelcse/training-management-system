@@ -17,13 +17,15 @@ public class AssignmentSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JoinColumn(name = "user_id")
     @JsonBackReference
     @ManyToOne
-    private User user;
+    private User student;
     private String fileLocation;
-    private int obtainedMarks;
+    private double obtainedMarks;
     @JsonBackReference
     @ManyToOne
+    @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
 }
