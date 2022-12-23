@@ -1,8 +1,6 @@
 package com.training.erp.service;
 
-import com.training.erp.entity.Batch;
-import com.training.erp.entity.Course;
-import com.training.erp.model.request.AddTrainerRequest;
+import com.training.erp.model.request.AddTrainerToCourseRequest;
 import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
@@ -25,7 +23,7 @@ public interface CourseService {
 
     CourseDetails getCourseById(long id);
 
-    MessageResponse addTrainerToCourse(AddTrainerRequest request);
+    MessageResponse addTrainerToCourse(AddTrainerToCourseRequest request);
 
     MessageResponse removeTrainerFromCourse(RemoveTrainerRequest request);
 

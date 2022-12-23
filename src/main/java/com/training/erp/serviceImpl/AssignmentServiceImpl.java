@@ -6,10 +6,7 @@ import com.training.erp.mapper.AssignmentMapper;
 import com.training.erp.mapper.UserMapper;
 import com.training.erp.model.request.AssignmentCreateRequest;
 import com.training.erp.model.request.AssignmentEvaluateRequest;
-import com.training.erp.model.response.AssignmentResponse;
-import com.training.erp.model.response.AssignmentSubmissionResponse;
-import com.training.erp.model.response.SubmissionResponse;
-import com.training.erp.model.response.UserProfile;
+import com.training.erp.model.response.*;
 import com.training.erp.repository.*;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.util.FilesStorageService;
@@ -93,7 +90,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public List<AssignmentSubmissionResponse> getAssignmentSubmissionByAssignmentId(long assignmentId) {
+    public List<AssignmentSubmissionResponse> getSubmissionsByAssignmentId(long assignmentId) {
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
 
@@ -116,7 +113,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public AssignmentSubmissionResponse getTraineesSubmissionBySubmissionId(long id) {
+    public AssignmentSubmissionResponse getSubmissionById(long id) {
         AssignmentSubmission submission = traineesAssignmentSubmissionRepository.findById(id)
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
 
@@ -149,12 +146,17 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public void updateSubmission(AssignmentEvaluateRequest request) {
+    public UpdatedSubmissionResponse updateSubmission(AssignmentEvaluateRequest request) {
         AssignmentSubmission evaluatedAssignment
                 = traineesAssignmentSubmissionRepository.findById(request.getSubmissionId())
                 .orElseThrow(() -> new TraineesAssignmentSubmissionNotFoundException("Submission not found"));
         evaluatedAssignment.setObtainedMarks(request.getMarks());
-        traineesAssignmentSubmissionRepository.save(evaluatedAssignment);
+        AssignmentSubmission submission =  traineesAssignmentSubmissionRepository.save(evaluatedAssignment);
+        return UpdatedSubmissionResponse.builder()
+                .submissionId(submission.getId())
+                .totalMarks(submission.getAssignment().getTotalMarks())
+                .obtainedMarks(submission.getObtainedMarks())
+                .build();
     }
 
     @Override
@@ -195,7 +197,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public List<SubmissionResponse> getSubmissionsByStudentUsername(String username) {
+    public List<SubmissionResponse> getSubmissionsByStudent(String username) {
 
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {

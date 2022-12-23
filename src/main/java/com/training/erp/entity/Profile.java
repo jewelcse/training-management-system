@@ -62,7 +62,4 @@ public class Profile {
     @Size(max = 32)
     private String zipCode;
 
-    @JsonBackReference
-    @OneToOne(fetch =FetchType.LAZY ,mappedBy = "profile")
-    private User user;
 }

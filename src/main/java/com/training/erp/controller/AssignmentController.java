@@ -5,10 +5,7 @@ import com.training.erp.entity.User;
 import com.training.erp.mapper.AssignmentMapper;
 import com.training.erp.model.request.AssignmentCreateRequest;
 import com.training.erp.model.request.AssignmentEvaluateRequest;
-import com.training.erp.model.response.AssignmentResponse;
-import com.training.erp.model.response.AssignmentSubmissionResponse;
-import com.training.erp.model.response.MessageResponse;
-import com.training.erp.model.response.SubmissionResponse;
+import com.training.erp.model.response.*;
 import com.training.erp.repository.AssignmentSubmissionRepository;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.service.UserService;
@@ -35,9 +32,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class AssignmentController {
-
     private final AssignmentService assignmentService;
-
     private final FilesStorageService filesStorageService;
 
     @PostMapping("/assignments")
@@ -61,26 +56,20 @@ public class AssignmentController {
     }
 
     @GetMapping("/assignments/{id}/submissions")
-    public ResponseEntity<?> getAssignmentSubmissionsByAssignmentId(@PathVariable("id") long assignmentId) {
-        return ResponseEntity.ok(assignmentService.getAssignmentSubmissionByAssignmentId(assignmentId));
+    public ResponseEntity<?> getSubmissionsByAssignment(@PathVariable("id") long assignmentId) {
+        return ResponseEntity.ok(assignmentService.getSubmissionsByAssignmentId(assignmentId));
     }
 
     @GetMapping("/assignments/trainees/submissions/{id}")
-    public ResponseEntity<AssignmentSubmissionResponse> getStudentSubmissionBySubmissionId(@PathVariable("id") long submissionId) {
-        return ResponseEntity.ok(assignmentService.getTraineesSubmissionBySubmissionId(submissionId));
+    public ResponseEntity<AssignmentSubmissionResponse> getSubmissionById(@PathVariable("id") long submissionId) {
+        return ResponseEntity.ok(assignmentService.getSubmissionById(submissionId));
     }
 
-
-    // Trainer update the trainees' assignment
-    // Trainer can evaluate the trainees' submission
-    // Added marks for the submitted assignment
     @PostMapping("/assignments/evaluate")
-    public ResponseEntity<?> evaluateAssignment(@RequestBody AssignmentEvaluateRequest request) {
-        assignmentService.updateSubmission(request);
-        return ResponseEntity.ok("Updated");
+    public ResponseEntity<UpdatedSubmissionResponse> evaluateAssignment(@RequestBody AssignmentEvaluateRequest request) {
+        return ResponseEntity.ok(assignmentService.updateSubmission(request));
     }
 
-    // Delete assignment by assignment ID
     @DeleteMapping("/assignments/{id}")
     public ResponseEntity<?> remove(@PathVariable("id") long id) {
         assignmentService.deleteAssignmentById(id);
@@ -95,7 +84,7 @@ public class AssignmentController {
             username = ((UserDetails) principal).getUsername();
             System.out.println("in controller username: " + username);
         }
-        return ResponseEntity.ok(assignmentService.getSubmissionsByStudentUsername(username));
+        return ResponseEntity.ok(assignmentService.getSubmissionsByStudent(username));
 
     }
 

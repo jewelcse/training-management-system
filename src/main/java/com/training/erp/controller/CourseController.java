@@ -1,30 +1,19 @@
 package com.training.erp.controller;
 
 
-import com.training.erp.entity.*;
-import com.training.erp.exception.BatchNotFoundException;
-import com.training.erp.exception.CourseNotFoundException;
-import com.training.erp.exception.TrainerNotFoundException;
-import com.training.erp.exception.UserNotFoundException;
-import com.training.erp.model.request.AddTrainerRequest;
+import com.training.erp.model.request.AddTrainerToCourseRequest;
 import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
 import com.training.erp.model.response.CourseDetails;
 import com.training.erp.model.response.CourseResponse;
 import com.training.erp.model.response.MessageResponse;
-import com.training.erp.service.AssignmentService;
-import com.training.erp.service.BatchService;
 import com.training.erp.service.CourseService;
-import com.training.erp.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 @RequiredArgsConstructor
 @RestController
@@ -59,7 +48,7 @@ public class CourseController {
     }
 
     @PostMapping("/courses/add-trainer")
-    public ResponseEntity<MessageResponse> addTrainer(@RequestBody AddTrainerRequest request){
+    public ResponseEntity<MessageResponse> addTrainer(@RequestBody AddTrainerToCourseRequest request){
         return new ResponseEntity<>(courseService.addTrainerToCourse(request), HttpStatus.ACCEPTED);
     }
 

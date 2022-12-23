@@ -18,8 +18,8 @@ public interface UserService {
     Optional<User> findByEmail(String email);
     boolean existsByUsername(String userName);
     boolean existsByEmail(String email);
-    RegisterResponse save(RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException;
-    UserAddResponse save(UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException;
+    RegisterResponse save(RegisterRequest request);
+    UserAddResponse save(UserAddRequest request);
 
     List<User> getAllUser();
     List<User> getAllUserByRole(ERole role);

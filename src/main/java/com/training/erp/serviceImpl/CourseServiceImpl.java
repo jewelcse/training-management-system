@@ -1,6 +1,6 @@
 package com.training.erp.serviceImpl;
 
-import com.training.erp.entity.Batch;
+import com.training.erp.entity.Assignment;
 import com.training.erp.entity.Course;
 import com.training.erp.entity.User;
 import com.training.erp.exception.CourseNotFoundException;
@@ -8,18 +8,18 @@ import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.mapper.AssignmentMapper;
 import com.training.erp.mapper.CourseMapper;
 import com.training.erp.mapper.UserMapper;
-import com.training.erp.model.request.AddTrainerRequest;
+import com.training.erp.model.request.AddTrainerToCourseRequest;
 import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
 import com.training.erp.model.response.CourseDetails;
 import com.training.erp.model.response.CourseResponse;
 import com.training.erp.model.response.MessageResponse;
+import com.training.erp.repository.AssignmentRepository;
 import com.training.erp.repository.CourseRepository;
 import com.training.erp.repository.UserRepository;
 import com.training.erp.service.CourseService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +29,7 @@ import java.util.Optional;
 @Service
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
+    private final AssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
     private final CourseMapper courseMapper;
     private final AssignmentMapper assignmentMapper;
@@ -66,17 +67,18 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CourseDetails getCourseById(long id) {
         Course course = getCourse(id);
+        List<Assignment> assignments = assignmentRepository.findAllByCourse(course);
         return CourseDetails.builder()
                 .id(course.getId())
                 .courseName(course.getCourseName())
                 .courseDescription(course.getCourseDescription())
                 .trainer(userManager.userToUserDetails(course.getTrainer()))
-                .assignments(assignmentMapper.assignmentsToAssignmentsResponse(course.getAssignments()))
+                .assignments(assignmentMapper.assignmentsToAssignmentsResponse(assignments))
                 .build();
     }
 
     @Override
-    public MessageResponse addTrainerToCourse(AddTrainerRequest request) {
+    public MessageResponse addTrainerToCourse(AddTrainerToCourseRequest request) {
         Course course = getCourse(request.getCourseId());
         User trainer = getUser(request.getTrainerId());
         // add trainer

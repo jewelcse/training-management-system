@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddCourseRequest {
+public class AddCourseToBatchRequest {
     private long batchId;
     private long courseId;
 }

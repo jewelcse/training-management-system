@@ -43,7 +43,7 @@ public class BatchController {
     }
 
     @PostMapping("/batches/add-user")
-    public ResponseEntity<MessageResponse> addUser(@RequestBody AssignUserRequest request) {
+    public ResponseEntity<MessageResponse> addUser(@RequestBody AddUserToBatchRequest request) {
         return new ResponseEntity<>(batchService.assignUserToBatch(request), HttpStatus.ACCEPTED);
     }
 
@@ -53,7 +53,7 @@ public class BatchController {
     }
 
     @PostMapping("/batches/add-course")
-    public ResponseEntity<MessageResponse> addCourse(@RequestBody AddCourseRequest request){
+    public ResponseEntity<MessageResponse> addCourse(@RequestBody AddCourseToBatchRequest request){
         return new ResponseEntity<>(batchService.addCourseToBatch(request), HttpStatus.ACCEPTED);
     }
 

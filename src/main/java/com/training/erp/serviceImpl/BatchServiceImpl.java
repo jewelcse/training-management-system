@@ -68,7 +68,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
-    public MessageResponse assignUserToBatch(AssignUserRequest request) throws BatchNotFoundException, UserNotFoundException {
+    public MessageResponse assignUserToBatch(AddUserToBatchRequest request) throws BatchNotFoundException, UserNotFoundException {
         Batch batch = getBatch(request.getBatchId());
         User user = getUser(request.getUserId());
         Set<User> users = batch.getUsers();
@@ -95,7 +95,7 @@ public class BatchServiceImpl implements BatchService {
     }
 
     @Override
-    public MessageResponse addCourseToBatch(AddCourseRequest request) {
+    public MessageResponse addCourseToBatch(AddCourseToBatchRequest request) {
         Batch batch = getBatch(request.getBatchId());
         Course course = getCourse(request.getCourseId());
         List<Course> courses = batch.getCourses();

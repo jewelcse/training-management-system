@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public RegisterResponse save(RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+    public RegisterResponse save(RegisterRequest request) {
         //user
         User user = new User();
         user.setUsername(request.getUsername());
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserAddResponse save(UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+    public UserAddResponse save(UserAddRequest request) {
         //generate random username and password
         String randomUserPassword = RandomString.make(8);
         String randomUsername = request.getFirstName().toLowerCase() + "@" + RandomString.make(4);

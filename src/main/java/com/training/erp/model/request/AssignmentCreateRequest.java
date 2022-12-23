@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class AssignmentCreateRequest {
     private String title;
-    private int marks;
+    private double marks;
     private String filePath;
     private long courseId;
 }

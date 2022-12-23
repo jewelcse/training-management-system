@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddTrainerRequest {
+public class AddTrainerToCourseRequest {
     private long trainerId;
     private long courseId;
 }
