@@ -13,8 +13,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.training.erp.util.UtilProperties.APPLICATION_SECRET_KEY;
-import static com.training.erp.util.UtilProperties.TOKEN_EXPIRATION_TIME;
+import static com.tms.util.UtilProperties.*;
+
 
 @Component
 public class JwtUtil {

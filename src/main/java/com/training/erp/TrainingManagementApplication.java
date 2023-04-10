@@ -1,7 +1,7 @@
 package com.training.erp;
 
+import com.training.erp.security.FilesStorageService;
 import com.training.erp.security.jwt.AuthTokenFilter;
-import com.training.erp.util.FilesStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

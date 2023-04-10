@@ -1,7 +1,8 @@
-package com.tms.service.serviceImpl;
+package com.training.erp.security;
 
 import com.tms.entity.*;
 import com.tms.repository.*;
+import com.tms.service.serviceImpl.UserDetailsImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

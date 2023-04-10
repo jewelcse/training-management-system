@@ -1,6 +1,6 @@
-package com.training.erp.util;
+package com.tms.util;
 
-import com.tms.entity.*;
+import com.tms.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;

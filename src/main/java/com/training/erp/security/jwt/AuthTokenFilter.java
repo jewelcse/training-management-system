@@ -1,6 +1,6 @@
 package com.training.erp.security.jwt;
 
-import com.tms.service.serviceImpl.UserDetailsServiceImpl;
+import com.training.erp.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

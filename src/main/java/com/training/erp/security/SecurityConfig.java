@@ -1,6 +1,5 @@
 package com.training.erp.security;
 
-import com.tms.service.serviceImpl.UserDetailsServiceImpl;
 import com.training.erp.security.jwt.AuthTokenFilter;
 import com.training.erp.security.jwt.JwtAuthEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.training.erp.util;
+package com.training.erp.security;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
