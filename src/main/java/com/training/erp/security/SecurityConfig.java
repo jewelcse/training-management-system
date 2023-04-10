@@ -1,8 +1,8 @@
 package com.training.erp.security;
 
+import com.tms.service.serviceImpl.UserDetailsServiceImpl;
 import com.training.erp.security.jwt.AuthTokenFilter;
 import com.training.erp.security.jwt.JwtAuthEntryPoint;
-import com.training.erp.serviceImpl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

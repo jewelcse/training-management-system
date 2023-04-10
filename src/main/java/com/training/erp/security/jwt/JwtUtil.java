@@ -1,7 +1,8 @@
 package com.training.erp.security.jwt;
 
 
-import com.training.erp.serviceImpl.UserDetailsImpl;
+
+import com.tms.service.serviceImpl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

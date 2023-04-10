@@ -16,6 +16,11 @@
 	<modules>
 		<module>entity</module>
 		<module>repository</module>
+		<module>exception</module>
+		<module>dto</module>
+		<module>service</module>
+		<module>mapper</module>
+		<module>controller</module>
 	</modules>
 	<properties>
 		<java.version>11</java.version>
@@ -108,6 +113,12 @@
 		<dependency>
 			<groupId>com.student.erp</groupId>
 			<artifactId>entity</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.student.erp</groupId>
+			<artifactId>service</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
