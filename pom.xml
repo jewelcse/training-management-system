@@ -13,6 +13,9 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>training-management-system</name>
 	<description>Demo project for Spring Boot</description>
+	<modules>
+		<module>entity</module>
+	</modules>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
