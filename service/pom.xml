@@ -12,11 +12,17 @@
     <properties>
         <java.version>11</java.version>
     </properties>
-
+    <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>com.student.erp</groupId>
             <artifactId>repository</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.student.erp</groupId>
+            <artifactId>entity</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -35,6 +41,12 @@
         <dependency>
             <groupId>com.student.erp</groupId>
             <artifactId>mapper</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.student.erp</groupId>
+            <artifactId>util</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

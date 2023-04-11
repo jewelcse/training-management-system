@@ -6,8 +6,8 @@ import com.tms.entity.*;
 import com.tms.exception.*;
 import com.tms.repository.*;
 import com.tms.service.*;
-import com.training.erp.util.EmailService;
-import com.training.erp.util.UtilMethods;
+import com.tms.util.EmailService;
+import com.tms.util.UtilMethods;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.training.erp.util.UtilProperties.*;
+import static com.tms.util.UtilProperties.*;
 
 
 @Service
