@@ -88,9 +88,9 @@ public class UserServiceImpl implements UserService {
             roles.add(defaultRole);
             user.setRoles(roles);
             user.setNonLocked(true);
-            response.setAccountLocked(false);
+            response.setAccountNonLocked(false);
             response.setAccountVerified(false);
-            response.setProfileType("TRAINEE ACCOUNT");
+            response.setAccountType("TRAINEE ACCOUNT");
             userRepository.save(user);
             saveTrainee(request.getFirstName(),request.getLastName(),user);
         } else {
@@ -101,9 +101,9 @@ public class UserServiceImpl implements UserService {
                     roles.add(trainerRole);
                     user.setRoles(roles);
                     user.setNonLocked(false);
-                    response.setAccountLocked(true);
+                    response.setAccountNonLocked(true);
                     response.setAccountVerified(false);
-                    response.setProfileType("TRAINER ACCOUNT");
+                    response.setAccountType("TRAINER ACCOUNT");
                     userRepository.save(user);
                     saveTrainer(request.getFirstName(),request.getLastName(),user);
                     break;
@@ -113,9 +113,9 @@ public class UserServiceImpl implements UserService {
                     roles.add(traineeRole);
                     user.setRoles(roles);
                     user.setNonLocked(true);
-                    response.setAccountLocked(false);
+                    response.setAccountNonLocked(false);
                     response.setAccountVerified(false);
-                    response.setProfileType("TRAINEE ACCOUNT");
+                    response.setAccountType("TRAINEE ACCOUNT");
                     userRepository.save(user);
                     saveTrainee(request.getFirstName(),request.getLastName(),user);
                     break;
