@@ -19,6 +19,9 @@ public class FilesStorageService {
 
     private final Path root = Paths.get("uploads");
 
+    // This method is now Deprecated
+    // instead of this now using the  "onApplicationEvent" method from
+    // "ApplicationListener" interface
     public void init() {
         try {
             Files.createDirectory(root);
