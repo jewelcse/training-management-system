@@ -1,6 +1,7 @@
-package com.training.erp.entity;
+package com.training.erp.entity.batches;
 
-import com.fasterxml.jackson.annotation.*;
+import com.training.erp.entity.courses.Course;
+import com.training.erp.entity.users.User;
 import lombok.*;
 
 import javax.persistence.*;

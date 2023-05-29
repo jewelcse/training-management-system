@@ -1,6 +1,9 @@
 package com.training.erp.serviceImpl;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.assignments.Assignment;
+import com.training.erp.entity.assignments.AssignmentSubmission;
+import com.training.erp.entity.courses.Course;
+import com.training.erp.entity.users.User;
 import com.training.erp.exception.*;
 import com.training.erp.mapper.AssignmentMapper;
 import com.training.erp.mapper.UserMapper;
@@ -11,8 +14,6 @@ import com.training.erp.repository.*;
 import com.training.erp.service.AssignmentService;
 import com.training.erp.util.FilesStorageService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

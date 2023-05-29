@@ -1,6 +1,8 @@
 package com.training.erp.serviceImpl;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.batches.Batch;
+import com.training.erp.entity.courses.Course;
+import com.training.erp.entity.users.User;
 import com.training.erp.exception.BatchNotFoundException;
 import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.exception.UserNotFoundException;

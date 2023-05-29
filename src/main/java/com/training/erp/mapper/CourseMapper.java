@@ -1,6 +1,6 @@
 package com.training.erp.mapper;
 
-import com.training.erp.entity.Course;
+import com.training.erp.entity.courses.Course;
 import com.training.erp.model.response.CourseResponse;
 import org.springframework.stereotype.Component;
 

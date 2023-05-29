@@ -1,6 +1,6 @@
-package com.training.erp.entity;
+package com.training.erp.entity.assignments;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.training.erp.entity.users.User;
 import lombok.*;
 
 import javax.persistence.*;

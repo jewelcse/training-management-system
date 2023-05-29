@@ -1,11 +1,11 @@
 package com.training.erp.controller;
 
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.users.Role;
+import com.training.erp.entity.users.User;
 import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

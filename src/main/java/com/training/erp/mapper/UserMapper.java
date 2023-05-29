@@ -1,7 +1,7 @@
 package com.training.erp.mapper;
 
-import com.training.erp.entity.Profile;
-import com.training.erp.entity.User;
+import com.training.erp.entity.users.Profile;
+import com.training.erp.entity.users.User;
 import com.training.erp.model.response.UserDetails;
 import com.training.erp.model.response.UserProfile;
 import org.springframework.stereotype.Component;

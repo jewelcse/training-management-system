@@ -1,5 +1,6 @@
-package com.training.erp.entity;
+package com.training.erp.entity.users;
 
+import com.training.erp.entity.users.ERole;
 import lombok.*;
 
 import javax.persistence.*;

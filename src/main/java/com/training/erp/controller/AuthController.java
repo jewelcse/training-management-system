@@ -1,6 +1,7 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.users.User;
+import com.training.erp.entity.users.UserVerificationCenter;
 import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.*;
@@ -46,8 +47,8 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/sign-in")
-    public ResponseEntity<LoginResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    @PostMapping("/signin")
+    public ResponseEntity<LoginResponse> signIn(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -59,8 +60,8 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<?> signup(@Valid @RequestBody RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+    @PostMapping("/signup")
+    public ResponseEntity<?> signUp(@Valid @RequestBody RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
 
         if (userService.existsByUsername(request.getUsername())) {
             return ResponseEntity

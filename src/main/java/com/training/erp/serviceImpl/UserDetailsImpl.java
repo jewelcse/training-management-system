@@ -1,7 +1,7 @@
 package com.training.erp.serviceImpl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.training.erp.entity.User;
+import com.training.erp.entity.users.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

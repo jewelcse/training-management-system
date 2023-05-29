@@ -1,5 +1,7 @@
 package com.training.erp.entity;
 
+import com.training.erp.entity.batches.Batch;
+import com.training.erp.entity.courses.Course;
 import lombok.*;
 
 import javax.persistence.*;

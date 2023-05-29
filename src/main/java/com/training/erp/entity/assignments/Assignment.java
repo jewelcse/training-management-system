@@ -1,13 +1,10 @@
-package com.training.erp.entity;
+package com.training.erp.entity.assignments;
 
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.training.erp.entity.courses.Course;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Setter
 @Getter

@@ -1,6 +1,6 @@
 package com.training.erp.mapper;
 
-import com.training.erp.entity.Batch;
+import com.training.erp.entity.batches.Batch;
 import com.training.erp.model.response.BatchCreateResponse;
 import org.springframework.stereotype.Component;
 

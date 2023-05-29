@@ -1,7 +1,7 @@
 package com.training.erp.repository;
 
-import com.training.erp.entity.ERole;
-import com.training.erp.entity.Role;
+import com.training.erp.entity.users.ERole;
+import com.training.erp.entity.users.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

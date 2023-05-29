@@ -1,7 +1,7 @@
 package com.training.erp.model.response;
 
-import com.training.erp.entity.Gender;
-import com.training.erp.entity.Role;
+import com.training.erp.entity.users.Gender;
+import com.training.erp.entity.users.Role;
 import lombok.*;
 
 import java.util.Date;

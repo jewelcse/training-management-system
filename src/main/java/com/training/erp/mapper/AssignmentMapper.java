@@ -1,6 +1,6 @@
 package com.training.erp.mapper;
 
-import com.training.erp.entity.Assignment;
+import com.training.erp.entity.assignments.Assignment;
 import com.training.erp.model.response.AssignmentResponse;
 import org.springframework.stereotype.Component;
 

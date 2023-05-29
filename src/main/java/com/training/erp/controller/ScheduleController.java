@@ -1,14 +1,10 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.Course;
 import com.training.erp.entity.Schedule;
 import com.training.erp.exception.BatchNotFoundException;
 import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.model.request.ScheduleRequest;
-import com.training.erp.service.BatchService;
-import com.training.erp.service.CourseService;
 import com.training.erp.service.ScheduleService;
-import com.training.erp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

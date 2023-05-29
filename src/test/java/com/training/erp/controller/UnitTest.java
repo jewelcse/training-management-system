@@ -1,6 +1,9 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.assignments.Assignment;
+import com.training.erp.entity.batches.Batch;
+import com.training.erp.entity.courses.Course;
+import com.training.erp.entity.users.User;
 import com.training.erp.repository.BatchRepository;
 import com.training.erp.repository.CourseRepository;
 import com.training.erp.repository.UserRepository;

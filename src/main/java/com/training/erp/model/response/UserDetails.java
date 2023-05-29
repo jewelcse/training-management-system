@@ -1,9 +1,8 @@
 package com.training.erp.model.response;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.users.Role;
 import lombok.*;
 
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor

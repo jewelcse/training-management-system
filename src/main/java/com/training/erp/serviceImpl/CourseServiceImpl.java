@@ -1,8 +1,8 @@
 package com.training.erp.serviceImpl;
 
-import com.training.erp.entity.Assignment;
-import com.training.erp.entity.Course;
-import com.training.erp.entity.User;
+import com.training.erp.entity.assignments.Assignment;
+import com.training.erp.entity.courses.Course;
+import com.training.erp.entity.users.User;
 import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.mapper.AssignmentMapper;

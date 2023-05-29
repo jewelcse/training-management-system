@@ -1,7 +1,7 @@
 package com.training.erp.service;
 
-import com.training.erp.entity.*;
-import com.training.erp.exception.RoleNotFoundException;
+import com.training.erp.entity.users.User;
+import com.training.erp.entity.users.UserVerificationCenter;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserAddRequest;
 import com.training.erp.model.request.UserUpdateRequest;

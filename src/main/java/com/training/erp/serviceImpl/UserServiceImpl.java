@@ -1,6 +1,6 @@
 package com.training.erp.serviceImpl;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.users.*;
 import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserAddRequest;
@@ -13,7 +13,6 @@ import com.training.erp.util.EmailService;
 import com.training.erp.util.UtilMethods;
 import lombok.AllArgsConstructor;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

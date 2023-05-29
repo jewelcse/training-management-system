@@ -1,11 +1,10 @@
-package com.training.erp.entity;
+package com.training.erp.entity.users;
 
 
+import com.training.erp.entity.users.User;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.sql.Timestamp;
 
 
