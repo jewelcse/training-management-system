@@ -58,17 +58,14 @@ The TMS has a number of features, including: \
 :heavy_check_mark: Batch creation: Users can create training batches, including the batch start and end dates.\
 :heavy_check_mark: Course creation: Users can create new courses, including adding course content, setting deadlines, and assigning tasks(assignments).\
 :heavy_check_mark: Course management: Users can view and edit existing courses, as well as assign courses to students.\
-:heavy_check_mark: Course tracking: The TMS tracks student progress and provides reports on student performance.\
+:heavy_check_mark: Course scheduling: Users can create and manages the course scheduling with calendars view.\
+:heavy_check_mark: Course tracking: The TMS tracks student progress and provides reports on student performance. Trainers can evaluate the student performance and can prepare reports.\
 :heavy_check_mark: User management: The TMS allows users to create and manage user accounts, including assigning roles and permissions.\
 The TMS is still under development, but it has a number of features that make it a valuable tool for training management.
 
 Here are some additional details about the project:
 
-The project was started in 2022 by Jewelcse.
-The project is currently hosted on GitHub.
-The project is open source and licensed under the MIT License.
-The project is actively developed and maintained by Jewelcse.
-If you are interested in using the TMS, you can find more information on the project's GitHub page.
+
 
 ## :rocket: Technologies ##
 
@@ -77,7 +74,11 @@ The following tools were used in this project:
 - [Java 11](#)
 - [Maven](#)
 - [Spring Boot](#)
-
+- [Spring Security](#)
+- [JWT Token](#)
+- [Spring JPA](#)
+- [MySQL](#)
+- [Unit Testing](#)
 
 ## :white_check_mark: Requirements ##
 
