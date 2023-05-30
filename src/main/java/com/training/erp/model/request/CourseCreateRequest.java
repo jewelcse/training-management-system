@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseCreateRequest {
-    private String course_name;
-    private String course_description;
+    private String courseName;
+    private String courseDescription;
 }

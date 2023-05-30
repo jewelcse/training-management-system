@@ -16,28 +16,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
-//@EnableCaching
-public class TrainingManagementApplication implements CommandLineRunner {
-
-	@Autowired
-	private FilesStorageService filesStorageService;
+public class TrainingManagementApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TrainingManagementApplication.class, args);
-	}
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder(){
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public AuthTokenFilter authTokenFilter(){
-		return new AuthTokenFilter();
-	}
-
-
-	@Override
-	public void run(String... args) throws Exception {
-		//filesStorageService.init();
 	}
 }

@@ -1,6 +1,6 @@
 package com.training.erp.exception;
 
-public class CourseNotFoundException extends Exception {
+public class CourseNotFoundException extends RuntimeException {
     public CourseNotFoundException(String message){
         super(message);
     }

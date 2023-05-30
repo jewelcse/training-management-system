@@ -1,23 +1,26 @@
 package com.training.erp.service;
 
-import com.training.erp.entity.Assignment;
-import com.training.erp.entity.Course;
-import com.training.erp.entity.TraineesAssignmentSubmission;
-import com.training.erp.exception.*;
-import com.training.erp.model.request.AssignmentRequestDto;
-import com.training.erp.model.request.AssignmentSubmissionUpdateRequest;
+import com.training.erp.model.request.AssignmentCreateRequest;
+import com.training.erp.model.request.AssignmentEvaluateRequest;
+import com.training.erp.model.response.AssignmentResponse;
+import com.training.erp.model.response.AssignmentSubmissionResponse;
+import com.training.erp.model.response.SubmissionResponse;
+import com.training.erp.model.response.UpdatedSubmissionResponse;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.util.List;
 
 public interface AssignmentService {
-    void createAssignment(AssignmentRequestDto assignmentRequestDto, Principal principal) throws BatchNotFoundException, UserNotFoundException, CourseNotFoundException;
-    List<Assignment> getAssignments();
-    List<Assignment> getAssignments(Principal principal);
-    List<Assignment> getAssignmentsByCourse(long courseId) throws CourseNotFoundException;
-    Assignment getAssignmentByAssignmentId(long assignmentId) throws AssignmentNotFoundException;
-    void deleteAssignmentByAssignmentId(long assignmentId) throws AssignmentNotFoundException;
-    List<TraineesAssignmentSubmission> getAssignmentSubmissionByAssignmentId(long assignmentId) throws AssignmentNotFoundException;
-    TraineesAssignmentSubmission getTraineesSubmissionBySubmissionId(long submissionId) throws TraineesAssignmentSubmissionNotFoundException;
-    void updateSubmission(AssignmentSubmissionUpdateRequest submission) throws TraineesAssignmentSubmissionNotFoundException;
+    AssignmentResponse save(AssignmentCreateRequest request);
+    List<AssignmentResponse> getAssignments();
+    List<AssignmentResponse> getAssignmentsByCourse(long courseId);
+    AssignmentResponse getAssignmentById(long assignmentId);
+    void deleteAssignmentById(long id);
+    List<AssignmentSubmissionResponse> getSubmissionsByAssignmentId(long assignmentId); // for trainer
+    AssignmentSubmissionResponse getSubmissionById(long submissionId);
+    UpdatedSubmissionResponse updateSubmission(AssignmentEvaluateRequest request);
+
+    boolean submitAssignment(MultipartFile file, long aid, long sid);
+
+    List<SubmissionResponse> getSubmissionsByStudent(String username); // for student
 }

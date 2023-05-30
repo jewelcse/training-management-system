@@ -1,21 +1,21 @@
 package com.training.erp.serviceImpl;
 
 
-import com.training.erp.entity.Batch;
-import com.training.erp.entity.Course;
+import com.training.erp.entity.batches.Batch;
+import com.training.erp.entity.courses.Course;
 import com.training.erp.entity.Schedule;
-import com.training.erp.entity.Trainer;
 import com.training.erp.repository.ScheduleRepository;
 import com.training.erp.service.ScheduleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
-    @Autowired
-    private ScheduleRepository scheduleRepository;
+
+    private final ScheduleRepository scheduleRepository;
     @Override
     public void saveSchedule(Schedule schedule) {
         scheduleRepository.save(schedule);
@@ -26,17 +26,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<Schedule> getSchedulesByTrainerId(Trainer trainer) {
-        return scheduleRepository.findAllByTrainer(trainer);
-    }
-
-    @Override
     public List<Schedule> getSchedulesByCourseAndBatch(Course course, Batch batch) {
         return scheduleRepository.findAllByCourseAndBatch(course, batch);
     }
 
-    @Override
-    public List<Schedule> getAllScheduleByBatch(Batch batch) {
-        return scheduleRepository.findAllByBatch(batch);
-    }
 }

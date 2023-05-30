@@ -1,7 +1,7 @@
 package com.training.erp.repository;
 
-import com.training.erp.entity.User;
-import com.training.erp.entity.UserVerificationCenter;
+import com.training.erp.entity.users.User;
+import com.training.erp.entity.users.UserVerificationCenter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -8,8 +8,8 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class MessageResponse {
-    @NotBlank
     private String message;
 
 }

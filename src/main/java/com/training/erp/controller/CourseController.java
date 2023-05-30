@@ -1,164 +1,60 @@
 package com.training.erp.controller;
 
 
-import com.training.erp.entity.*;
-import com.training.erp.exception.BatchNotFoundException;
-import com.training.erp.exception.CourseNotFoundException;
-import com.training.erp.exception.TrainerNotFoundException;
-import com.training.erp.exception.UserNotFoundException;
+import com.training.erp.model.request.AddTrainerToCourseRequest;
 import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
-import com.training.erp.model.response.CourseFullProfileResponse;
+import com.training.erp.model.request.RemoveTrainerRequest;
+import com.training.erp.model.response.CourseDetailsResponse;
+import com.training.erp.model.response.CourseResponse;
 import com.training.erp.model.response.MessageResponse;
-import com.training.erp.repository.TrainerRepository;
-import com.training.erp.service.AssignmentService;
-import com.training.erp.service.BatchService;
 import com.training.erp.service.CourseService;
-import com.training.erp.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Set;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 public class CourseController {
-    @Autowired
-    private CourseService courseService;
-    @Autowired
-    private BatchService batchService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TrainerRepository trainerRepository;
-    @Autowired
-    private AssignmentService assignmentService;
+    private final CourseService courseService;
 
-    // Create Course
-    //@Secured("ROLE_ADMIN")
     @PostMapping("/courses")
-    public ResponseEntity<?> createCourse(@RequestBody CourseCreateRequest request) {
-
-        if (courseService.existsByCourse(request.getCourse_name())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("The course already added!"));
-        }
-        courseService.createCourse(request);
-        return new ResponseEntity<>(new MessageResponse("Course created successfully"), HttpStatus.CREATED);
+    public ResponseEntity<CourseResponse> create(@RequestBody CourseCreateRequest request) {
+        return new ResponseEntity<>(courseService.save(request), HttpStatus.CREATED);
     }
 
+    @PutMapping("/courses")
+    public ResponseEntity<CourseResponse> update(@RequestBody CourseUpdateRequest request){
+        return new ResponseEntity<>(courseService.update(request), HttpStatus.OK);
+    }
 
-    // Get all courses
     @GetMapping("/courses")
-    public ResponseEntity<List<Course>> getCourses() {
+    public ResponseEntity<List<CourseResponse>> getCourses() {
         return ResponseEntity.ok(courseService.getCourses());
     }
 
-    // Get Trainers all course
-    @GetMapping("/courses/trainer")
-    public ResponseEntity<List<Course>> getCoursesByTrainerId(Principal principal) throws UserNotFoundException {
-        User user = userService
-                .findByUsername(principal.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Trainer trainer = trainerRepository.findByUser(user);
-
-        return ResponseEntity.ok(courseService.getCoursesByTrainerId(trainer.getId()));
+    @DeleteMapping("/courses/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") long id){
+        courseService.deleteCourseById(id);
+        return ResponseEntity.ok(new MessageResponse("Course remove successfully"));
     }
 
-    // Update Course
-    @PutMapping("/courses")
-    public ResponseEntity<?> updateCourse(@RequestBody CourseUpdateRequest request) throws UserNotFoundException, CourseNotFoundException {
-        courseService.updateCourse(request);
-        return new ResponseEntity<>(new MessageResponse("Course updated successfully"), HttpStatus.OK);
+    @GetMapping("/courses/{id}")
+    public ResponseEntity<CourseDetailsResponse> getCourse(@PathVariable("id") long id){
+        return ResponseEntity.ok(courseService.getCourseById(id));
     }
 
-    // Delete the course
-    @DeleteMapping("/courses/{course-id}")
-    public ResponseEntity<?> deleteCourseByCourseId(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
-        courseService.deleteCourseByCourseId(courseId);
-        return ResponseEntity.ok(new MessageResponse("Course deleted successfully"));
+    @PostMapping("/courses/add-trainer")
+    public ResponseEntity<MessageResponse> addTrainer(@RequestBody AddTrainerToCourseRequest request){
+        return new ResponseEntity<>(courseService.addTrainerToCourse(request), HttpStatus.ACCEPTED);
     }
 
-    // Get single course by course ID
-    @GetMapping("/courses/{course-id}")
-    public ResponseEntity<?> getCourseByCourseId(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
-        return ResponseEntity.ok(courseService.getCourseByCourseId(courseId));
+    @PostMapping("/courses/remove-trainer")
+    public ResponseEntity<MessageResponse> removeTrainer(@RequestBody RemoveTrainerRequest request){
+        return new ResponseEntity<>(courseService.removeTrainerFromCourse(request), HttpStatus.ACCEPTED);
     }
-
-    // Get Course full profile by course ID
-    // Get The course details
-    // Get Assigned trainers details
-    // Get the list of assignments
-    @GetMapping("/courses/profile/{course-id}")
-    public ResponseEntity<?> getCourseProfileByCourseId(@PathVariable("course-id") long courseId) throws CourseNotFoundException {
-
-        Course course = courseService.getCourseByCourseId(courseId);
-        Trainer trainer;
-        if (course.getTrainer() == null) {
-            trainer = new Trainer();
-        } else {
-            trainer = courseService.getTrainerProfileByCourse(course);
-        }
-
-        List<Assignment> assignments = assignmentService.getAssignmentsByCourse(course.getId());
-
-        return ResponseEntity.ok(new CourseFullProfileResponse(course, trainer, assignments));
-    }
-
-    // Assign trainer to course
-    @GetMapping("/courses/{course-id}/trainers/{trainer-id}")
-    public ResponseEntity<?> assignTrainerToCourse(@PathVariable("course-id") long courseId, @PathVariable("trainer-id") long trainerId) throws CourseNotFoundException, TrainerNotFoundException {
-        Course course = courseService.getCourseByCourseId(courseId);
-        Trainer trainer = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not Found"));
-        course.setTrainer(trainer);
-        courseService.updateCourseTrainer(course);
-        return ResponseEntity.ok(new MessageResponse("Trainer Assigned Success"));
-    }
-
-    // Add course to batch
-    @GetMapping("/courses/{course-id}/batches/{batch-id}")
-    public ResponseEntity<?> addCourseToBatch(@PathVariable("course-id") long courseId, @PathVariable("batch-id") long batchId) throws CourseNotFoundException, BatchNotFoundException {
-        Course course = courseService.getCourseByCourseId(courseId);
-        Batch batch = batchService.getBatchById(batchId)
-                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
-        Set<Course> courses = batch.getCourses();
-        courses.add(course);
-        batch.setCourses(courses);
-        batchService.updateBatch(batch);
-        return ResponseEntity.ok(new MessageResponse("Course Added Success"));
-    }
-
-    // Get courses by batch ID
-    @GetMapping("/courses/batches/{batch-id}")
-    public ResponseEntity<List<Course>> getCoursesByBatchId(@PathVariable("batch-id") long batchId) throws BatchNotFoundException {
-        Batch batch = batchService.getBatchById(batchId)
-                .orElseThrow(() -> new BatchNotFoundException("Batch no found"));
-        return ResponseEntity.ok(courseService.getCoursesByBatch(batch));
-    }
-
-    // Remove Trainer from Course
-    @DeleteMapping("/courses/{course-id}/trainers/{trainer-id}")
-    public ResponseEntity<?> removeTrainerFromCourse(@PathVariable("course-id") long courseId, @PathVariable("trainer-id") long trainerId) throws CourseNotFoundException, TrainerNotFoundException {
-        Course course = courseService.getCourseByCourseId(courseId);
-        Trainer trainer = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not Found"));
-        // check either the trainer is assigned before to the course or not
-        if (course.getTrainer() != trainer) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Trainer not found For This course");
-        }
-        courseService.removeTrainerFromCourse(course);
-        return ResponseEntity.ok(new MessageResponse("Trainer Remove Success"));
-    }
-
 
 }

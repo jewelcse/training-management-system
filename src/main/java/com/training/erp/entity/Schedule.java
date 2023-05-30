@@ -1,5 +1,7 @@
 package com.training.erp.entity;
 
+import com.training.erp.entity.batches.Batch;
+import com.training.erp.entity.courses.Course;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,17 +21,11 @@ public class Schedule {
     private Long id;
     private String title;
     private String description;
-
-    @ManyToOne
-    private Trainer trainer;
-
-    @ManyToOne
-    private Course course;
-
-    @ManyToOne
-    private Batch batch;
-
     private Timestamp start;
     private Timestamp end;
+    @ManyToOne
+    private Course course;
+    @ManyToOne
+    private Batch batch;
 
 }

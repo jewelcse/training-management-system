@@ -1,9 +1,11 @@
 package com.training.erp.controller;
 
-import com.training.erp.entity.*;
+import com.training.erp.entity.assignments.Assignment;
+import com.training.erp.entity.batches.Batch;
+import com.training.erp.entity.courses.Course;
+import com.training.erp.entity.users.User;
 import com.training.erp.repository.BatchRepository;
 import com.training.erp.repository.CourseRepository;
-import com.training.erp.repository.TrainerRepository;
 import com.training.erp.repository.UserRepository;
 import com.training.erp.service.BatchService;
 import com.training.erp.service.CourseService;
@@ -17,8 +19,6 @@ import org.springframework.boot.test.mock.mockito.*;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
