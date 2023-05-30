@@ -7,7 +7,6 @@
 </div>
 
 <h1 align="center">Training Management System</h1>
-<h3>Updated Branch: tms-v2</h3>
 
 <p align="center">
   <img alt="Github top language" src="https://img.shields.io/github/languages/top/jewelcse/training-management-system?color=56BEB8">
