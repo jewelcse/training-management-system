@@ -21,8 +21,8 @@ public class Schedule {
     private Long id;
     private String title;
     private String description;
-    private Timestamp start;
-    private Timestamp end;
+    private Timestamp courseStartAt;
+    private Timestamp courseEndAt;
     @ManyToOne
     private Course course;
     @ManyToOne

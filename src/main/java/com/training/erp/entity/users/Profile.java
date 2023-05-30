@@ -26,17 +26,14 @@ public class Profile {
     @Size(max = 10)
     private String lastName;
 
-    @Column(name = "phone_number")
     @Size(max = 15)
-    private String phoneNumber;
+    private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 10)
     private Gender gender;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "dob")
-    private Date dateOfBirth;
+    private Date dob;
 
     @Size(max = 100)
     private String address1;
@@ -56,7 +53,6 @@ public class Profile {
     @Size(max = 100)
     private String country;
 
-    @Column(name = "zip_code")
     @Size(max = 32)
     private String zipCode;
 

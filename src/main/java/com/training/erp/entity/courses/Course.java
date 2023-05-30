@@ -11,9 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "courses", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "courseName")
-})
+@Table(name = "courses")
 public class Course {
 
     @Id
@@ -23,7 +21,6 @@ public class Course {
     private String courseDescription;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "trainer_id")
     private User trainer;
 
 }

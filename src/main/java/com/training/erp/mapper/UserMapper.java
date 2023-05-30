@@ -32,12 +32,12 @@ public class UserMapper {
                 .city(profile.getCity())
                 .street(profile.getStreet())
                 .city(profile.getCity())
-                .dateOfBirth(profile.getDateOfBirth())
+                .dateOfBirth(profile.getDob())
                 .gender(profile.getGender())
                 .country(profile.getCountry())
                 .zipCode(profile.getZipCode())
                 .state(profile.getState())
-                .phoneNumber(profile.getPhoneNumber())
+                .phoneNumber(profile.getPhone())
                 .build();
     }
 

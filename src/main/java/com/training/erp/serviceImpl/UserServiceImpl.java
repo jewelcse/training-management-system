@@ -72,71 +72,11 @@ public class UserServiceImpl implements UserService {
         user.setEnabled(false);
         user.setNonLocked(true);
         user.setPassword(encoder.encode(request.getPassword()));
-        user.setRoles(checkRoles(request.getRole()));
+        user.setRole(checkRoles(request.getRole()));
         //profile
         Profile profile = new Profile();
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
-
-        String stringRole = request.getRole();
-        Set<Role> roles = new HashSet<>();
-        // response
-        RegisterResponse response = new RegisterResponse();
-        response.setFirstName(request.getFirstName());
-        response.setLastName(request.getLastName());
-        response.setEmail(request.getEmail());
-        response.setUsername(request.getUsername());
-        if (stringRole == null) {
-            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-            roles.add(defaultRole);
-            user.setRoles(roles);
-            user.setNonLocked(true);
-            response.setAccountNonLocked(false);
-            response.setAccountVerified(false);
-            response.setAccountType("TRAINEE ACCOUNT");
-            userRepository.save(user);
-            saveTrainee(request.getFirstName(),request.getLastName(),user);
-        } else {
-            switch (stringRole) {
-                case "ROLE_TRAINER":
-                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
-                    roles.add(trainerRole);
-                    user.setRoles(roles);
-                    user.setNonLocked(false);
-                    response.setAccountNonLocked(true);
-                    response.setAccountVerified(false);
-                    response.setAccountType("TRAINER ACCOUNT");
-                    userRepository.save(user);
-                    saveTrainer(request.getFirstName(),request.getLastName(),user);
-                    break;
-                case "ROLE_TRAINEE":
-                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
-                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
-                    roles.add(traineeRole);
-                    user.setRoles(roles);
-                    user.setNonLocked(true);
-                    response.setAccountNonLocked(false);
-                    response.setAccountVerified(false);
-                    response.setAccountType("TRAINEE ACCOUNT");
-                    userRepository.save(user);
-                    saveTrainee(request.getFirstName(),request.getLastName(),user);
-                    break;
-            }
-        }
-//        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
-//        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
-//        userVerificationCenter.setUser(user);
-//        userVerificationCenter.setVerificationCode(randomCode);
-//        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
-//        userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
-//        userVerificationCenterRepository.save(userVerificationCenter);
-//        emailService.sendVerificationEmail(user,randomCode);
-        System.out.println("response: "+response.toString());
-        return response;
-    }
-
 
         user.setProfile(profile);
         userRepository.save(user);
@@ -164,7 +104,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encoder.encode(randomUserPassword));
         user.setNonLocked(true);
         user.setEnabled(true);
-        user.setRoles(checkRoles(request.getRole()));
+        user.setRole(checkRoles(request.getRole()));
         //profile
         Profile profile = new Profile();
         profile.setFirstName(request.getFirstName());
@@ -201,10 +141,10 @@ public class UserServiceImpl implements UserService {
         user.setId(user.getId());
         user.setEmail(userUpdateRequest.getEmail());
         Set<Role> roles = new HashSet<>();
-        Role role = roleRepository.findByName(ERole.valueOf(userUpdateRequest.getRole()))
+        Role role = roleRepository.findByRoleName(ERole.valueOf(userUpdateRequest.getRole()))
                 .orElseThrow(() -> new RuntimeException("Role not found for " + userUpdateRequest.getRole()));
         roles.add(role);
-        user.setRoles(roles);
+        user.setRole(roles);
         return userRepository.save(user);
     }
 
@@ -238,10 +178,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVerificationCenter resendVerificationCode(UserVerificationCenter userVerificationCenter, User user) throws MessagingException, UnsupportedEncodingException {
         String code = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
-        userVerificationCenter.setVerificationCode(code);
-        userVerificationCenter.setMaxLimit(userVerificationCenter.getMaxLimit() - 1);
+        userVerificationCenter.setOtp(code);
+        userVerificationCenter.setMaxTries(userVerificationCenter.getMaxTries() - 1);
         userVerificationCenter.setUser(user);
-        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
+        userVerificationCenter.setOtpExpireAt(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
         userVerificationCenterRepository.save(userVerificationCenter);
         emailService.sendVerificationEmail(user, code);
         return userVerificationCenter;
@@ -271,18 +211,18 @@ public class UserServiceImpl implements UserService {
     private Set<Role> checkRoles(String stringRole) throws RoleNotFoundException {
         Set<Role> roles = new HashSet<>();
         if (stringRole == null) {
-            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+            Role defaultRole = roleRepository.findByRoleName(ERole.ROLE_TRAINEE)
                     .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
             roles.add(defaultRole);
         } else {
             switch (stringRole) {
                 case "ROLE_TRAINER":
-                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
+                    Role trainerRole = roleRepository.findByRoleName(ERole.ROLE_TRAINER)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " DOESN'T EXIST!"));
                     roles.add(trainerRole);
                     break;
                 case "ROLE_TRAINEE":
-                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                    Role traineeRole = roleRepository.findByRoleName(ERole.ROLE_TRAINEE)
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
                     roles.add(traineeRole);
                     break;
