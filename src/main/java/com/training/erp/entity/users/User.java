@@ -1,6 +1,7 @@
 package com.training.erp.entity.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.training.erp.entity.batches.Batch;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,8 +16,8 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "username"),
-        @UniqueConstraint(columnNames = "email")
+        @UniqueConstraint(columnNames = {"username"}),
+        @UniqueConstraint(columnNames = {"email"})
 })
 public class User {
 
@@ -37,15 +38,14 @@ public class User {
     private boolean nonLocked;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> role = new HashSet<>();
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
     private Profile profile;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Batch batch;
 
 
 }

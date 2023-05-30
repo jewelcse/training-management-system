@@ -122,12 +122,12 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .city(submission.getStudent().getProfile().getCity())
                 .street(submission.getStudent().getProfile().getStreet())
                 .city(submission.getStudent().getProfile().getCity())
-                .dateOfBirth(submission.getStudent().getProfile().getDateOfBirth())
+                .dateOfBirth(submission.getStudent().getProfile().getDob())
                 .gender(submission.getStudent().getProfile().getGender())
                 .country(submission.getStudent().getProfile().getCountry())
                 .zipCode(submission.getStudent().getProfile().getZipCode())
                 .state(submission.getStudent().getProfile().getState())
-                .phoneNumber(submission.getStudent().getProfile().getPhoneNumber())
+                .phoneNumber(submission.getStudent().getProfile().getPhone())
                 .build();
 
         return AssignmentSubmissionResponse.builder()

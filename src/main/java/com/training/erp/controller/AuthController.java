@@ -129,7 +129,7 @@ public class AuthController {
                 .email(user.getEmail())
                 .isNonLocked(user.isNonLocked())
                 .isEnabled(user.isEnabled())
-                .roles(user.getRoles())
+                .roles(user.getRole())
                 .build();
         return ResponseEntity.ok(details);
     }
@@ -146,17 +146,17 @@ public class AuthController {
                 .isNonLocked(user.isNonLocked())
                 .firstName(user.getProfile().getFirstName())
                 .lastName(user.getProfile().getLastName())
-                .phoneNumber(user.getProfile().getPhoneNumber())
+                .phoneNumber(user.getProfile().getPhone())
                 .street(user.getProfile().getStreet())
                 .state(user.getProfile().getState())
                 .zipCode(user.getProfile().getZipCode())
                 .gender(user.getProfile().getGender())
                 .city(user.getProfile().getCity())
                 .country(user.getProfile().getCountry())
-                .dateOfBirth(user.getProfile().getDateOfBirth())
+                .dateOfBirth(user.getProfile().getDob())
                 .address1(user.getProfile().getAddress1())
                 .address2(user.getProfile().getAddress2())
-                .roles(user.getRoles())
+                .roles(user.getRole())
                 .build();
 
         return new ResponseEntity<>(profile, HttpStatus.OK);
@@ -197,7 +197,7 @@ public class AuthController {
                     .body(new MessageResponse("ACCOUNT ALREADY VERIFIED!"));
         }
         Timestamp currentTimeMillis = new Timestamp(System.currentTimeMillis());
-        if (userVerificationCenter.getExpiryDate().before(currentTimeMillis)) {
+        if (userVerificationCenter.getOtpExpireAt().before(currentTimeMillis)) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("VERIFICATION CODE EXPIRED!"));
@@ -218,7 +218,7 @@ public class AuthController {
                     .body(new MessageResponse("ACCOUNT ALREADY VERIFIED!"));
         }
         UserVerificationCenter userVerificationCenter = userVerificationCenterRepository.findByUser(user);
-        if (userVerificationCenter.getMaxLimit() <= 3 && userVerificationCenter.getMaxLimit() > 0) {
+        if (userVerificationCenter.getMaxTries() <= 3 && userVerificationCenter.getMaxTries() > 0) {
             userService.resendVerificationCode(userVerificationCenter, user);
         } else {
             user.setNonLocked(false);

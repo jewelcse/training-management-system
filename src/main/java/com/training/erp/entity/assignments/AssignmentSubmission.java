@@ -11,21 +11,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "AssignmentSubmissions")
+@Table(name = "student_submissions")
 public class AssignmentSubmission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
-    @JoinColumn(name = "student_id")
     private User student;
     private String fileLocation;
     private double obtainedMarks;
-
     @ManyToOne
-    @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
 }

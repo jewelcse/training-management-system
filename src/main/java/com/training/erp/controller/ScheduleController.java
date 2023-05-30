@@ -41,8 +41,8 @@ public class ScheduleController {
         Schedule schedule = new Schedule();
         schedule.setTitle(request.getTopic());
         schedule.setDescription(request.getTopic_description());
-        schedule.setStart(request.getStart_date());
-        schedule.setEnd(request.getEnd_date());
+        schedule.setCourseEndAt(request.getStart_date());
+        schedule.setCourseEndAt(request.getEnd_date());
 
         scheduleService.saveSchedule(schedule);
 
@@ -50,7 +50,7 @@ public class ScheduleController {
     }
 
     private boolean isNotValidSchedule(List<Schedule> schedules, long data){
-        return schedules.stream().anyMatch(schedule -> schedule.getEnd().getTime() > data);
+        return schedules.stream().anyMatch(schedule -> schedule.getCourseEndAt().getTime() > data);
     }
 
 

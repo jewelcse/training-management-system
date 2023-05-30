@@ -21,14 +21,11 @@ public class UserVerificationCenter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name="verification_code")
-    private String verificationCode;
+    private String otp;
 
-    @Column(name="expiry_date")
-    private Timestamp expiryDate;
+    private Timestamp otpExpireAt;
 
-    @Column(name="max_limit")
-    private int maxLimit;
+    private int maxTries;
 
     @OneToOne
     private User user;
