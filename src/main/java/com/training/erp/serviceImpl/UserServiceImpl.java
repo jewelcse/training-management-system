@@ -78,6 +78,66 @@ public class UserServiceImpl implements UserService {
         profile.setFirstName(request.getFirstName());
         profile.setLastName(request.getLastName());
 
+        String stringRole = request.getRole();
+        Set<Role> roles = new HashSet<>();
+        // response
+        RegisterResponse response = new RegisterResponse();
+        response.setFirstName(request.getFirstName());
+        response.setLastName(request.getLastName());
+        response.setEmail(request.getEmail());
+        response.setUsername(request.getUsername());
+        if (stringRole == null) {
+            Role defaultRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+            roles.add(defaultRole);
+            user.setRoles(roles);
+            user.setNonLocked(true);
+            response.setAccountNonLocked(false);
+            response.setAccountVerified(false);
+            response.setAccountType("TRAINEE ACCOUNT");
+            userRepository.save(user);
+            saveTrainee(request.getFirstName(),request.getLastName(),user);
+        } else {
+            switch (stringRole) {
+                case "ROLE_TRAINER":
+                    Role trainerRole = roleRepository.findByName(ERole.ROLE_TRAINER)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " doesn't exist!"));
+                    roles.add(trainerRole);
+                    user.setRoles(roles);
+                    user.setNonLocked(false);
+                    response.setAccountNonLocked(true);
+                    response.setAccountVerified(false);
+                    response.setAccountType("TRAINER ACCOUNT");
+                    userRepository.save(user);
+                    saveTrainer(request.getFirstName(),request.getLastName(),user);
+                    break;
+                case "ROLE_TRAINEE":
+                    Role traineeRole = roleRepository.findByName(ERole.ROLE_TRAINEE)
+                            .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " doesn't exist!"));
+                    roles.add(traineeRole);
+                    user.setRoles(roles);
+                    user.setNonLocked(true);
+                    response.setAccountNonLocked(false);
+                    response.setAccountVerified(false);
+                    response.setAccountType("TRAINEE ACCOUNT");
+                    userRepository.save(user);
+                    saveTrainee(request.getFirstName(),request.getLastName(),user);
+                    break;
+            }
+        }
+//        String randomCode = RandomString.make(CHARACTER_LIMIT_FOR_VERIFICATION_CODE);
+//        UserVerificationCenter userVerificationCenter = new UserVerificationCenter();
+//        userVerificationCenter.setUser(user);
+//        userVerificationCenter.setVerificationCode(randomCode);
+//        userVerificationCenter.setExpiryDate(UtilMethods.calculateExpiryDate(TIME_FOR_VERIFICATION_EXPIRATION));
+//        userVerificationCenter.setMaxLimit(MAX_LIMIT_FOR_VERIFICATION);
+//        userVerificationCenterRepository.save(userVerificationCenter);
+//        emailService.sendVerificationEmail(user,randomCode);
+        System.out.println("response: "+response.toString());
+        return response;
+    }
+
+
         user.setProfile(profile);
         userRepository.save(user);
         //todo: sent verification mail

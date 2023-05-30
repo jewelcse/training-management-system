@@ -16,4 +16,6 @@ public class RegisterResponse {
     private String username;
     private boolean isAccountNonLocked;
     private boolean isAccountVerified;
+    private String accountType;
+
 }
