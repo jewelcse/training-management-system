@@ -40,6 +40,11 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(value = UserAccountException.class)
+    public ResponseEntity<JsonExceptionResponse> userAccountException(UserAccountException exception) {
+        return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(value = InputDataException.class)
     public ResponseEntity<JsonExceptionResponse> inputDataException(InputDataException exception) {
         return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);

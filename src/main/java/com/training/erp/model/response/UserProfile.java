@@ -17,6 +17,7 @@ public class UserProfile {
     private String lastName;
     private String username;
     private String email;
+    private String batch;
     private boolean isEnabled;
     private boolean isNonLocked;
     private Set<Role> roles;

@@ -16,4 +16,5 @@ public class UserDetails {
     private boolean isEnabled;
     private boolean isNonLocked;
     private Set<Role> roles;
+    private String batch;
 }

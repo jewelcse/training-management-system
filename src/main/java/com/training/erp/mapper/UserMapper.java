@@ -55,7 +55,6 @@ public class UserMapper {
         return userList;
     }
 
-
     public UserInfo userToUserInfo(User user){
 
         AtomicReference<String> batch = new AtomicReference<>("N/A");
@@ -71,6 +70,37 @@ public class UserMapper {
                 .isEnabled(user.isEnabled())
                 .batch(String.valueOf(batch))
                 .roles(user.getRole())
+                .build();
+    }
+
+    public UserProfile userToUserProfile(User user){
+
+        AtomicReference<String> batch = new AtomicReference<>("N/A");
+        Optional<Batch> userBatch = Optional.ofNullable(user.getBatch());
+        userBatch.ifPresent(obj -> {
+            batch.set(userBatch.get().getBatchName());
+        });
+
+        return UserProfile
+                .builder()
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .isEnabled(user.isEnabled())
+                .isNonLocked(user.isNonLocked())
+                .firstName(user.getProfile().getFirstName())
+                .lastName(user.getProfile().getLastName())
+                .phoneNumber(user.getProfile().getPhone())
+                .street(user.getProfile().getStreet())
+                .state(user.getProfile().getState())
+                .zipCode(user.getProfile().getZipCode())
+                .gender(user.getProfile().getGender())
+                .city(user.getProfile().getCity())
+                .country(user.getProfile().getCountry())
+                .dateOfBirth(user.getProfile().getDob())
+                .address1(user.getProfile().getAddress1())
+                .address2(user.getProfile().getAddress2())
+                .roles(user.getRole())
+                .batch(String.valueOf(batch))
                 .build();
     }
 }
