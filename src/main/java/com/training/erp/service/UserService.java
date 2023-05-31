@@ -7,6 +7,7 @@ import com.training.erp.model.request.UserAddRequest;
 import com.training.erp.model.request.UserUpdateRequest;
 import com.training.erp.model.response.RegisterResponse;
 import com.training.erp.model.response.UserAddResponse;
+import com.training.erp.model.response.UserInfo;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
@@ -21,7 +22,7 @@ public interface UserService {
     RegisterResponse save(RegisterRequest request);
     UserAddResponse save(UserAddRequest request);
 
-    List<User> getAllUser();
+    List<UserInfo> getAllUser();
     void deleteUserById(Long id);
     User updateUser(UserUpdateRequest userUpdateRequest);
     void activateDeactivateUserAccount(User user);

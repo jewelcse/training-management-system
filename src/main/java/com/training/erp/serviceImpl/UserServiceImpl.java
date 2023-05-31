@@ -1,12 +1,15 @@
 package com.training.erp.serviceImpl;
 
 import com.training.erp.entity.users.*;
+import com.training.erp.exception.RoleNotAllowedException;
 import com.training.erp.exception.RoleNotFoundException;
+import com.training.erp.mapper.UserMapper;
 import com.training.erp.model.request.RegisterRequest;
 import com.training.erp.model.request.UserAddRequest;
 import com.training.erp.model.request.UserUpdateRequest;
 import com.training.erp.model.response.RegisterResponse;
 import com.training.erp.model.response.UserAddResponse;
+import com.training.erp.model.response.UserInfo;
 import com.training.erp.repository.*;
 import com.training.erp.service.UserService;
 import com.training.erp.util.EmailService;
@@ -38,6 +41,8 @@ public class UserServiceImpl implements UserService {
     private final UserVerificationCenterRepository userVerificationCenterRepository;
 
     private final BCryptPasswordEncoder encoder;
+
+    private final UserMapper userMapper;
     EmailService emailService;
 
     @Override
@@ -62,9 +67,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
-    @Transactional
+    //@Transactional
     @Override
-    public RegisterResponse save(RegisterRequest request) {
+    public RegisterResponse save(RegisterRequest request){
         //user
         User user = new User();
         user.setUsername(request.getUsername());
@@ -72,7 +77,9 @@ public class UserServiceImpl implements UserService {
         user.setEnabled(false);
         user.setNonLocked(true);
         user.setPassword(encoder.encode(request.getPassword()));
+
         user.setRole(checkRoles(request.getRole()));
+
         //profile
         Profile profile = new Profile();
         profile.setFirstName(request.getFirstName());
@@ -124,8 +131,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUser() {
-        return userRepository.findAll();
+    public List<UserInfo> getAllUser() {
+        return userMapper.usersToUserInfoList(userRepository.findAll());
     }
 
     @Override
@@ -208,7 +215,31 @@ public class UserServiceImpl implements UserService {
 //        emailService.sendVerificationEmail(user,randomCode);
     }
 
-    private Set<Role> checkRoles(String stringRole) throws RoleNotFoundException {
+    private Set<Role> checkRole(String stringRole){
+        Set<Role> roles = new HashSet<>();
+        if (stringRole == null) {
+            Role defaultRole = roleRepository.findByRoleName(ERole.ROLE_TRAINEE)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
+            roles.add(defaultRole);
+        } else if(stringRole.equals(String.valueOf(ERole.ROLE_TRAINEE))){
+            Role defaultRole = roleRepository.findByRoleName(ERole.ROLE_TRAINEE)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
+            roles.add(defaultRole);
+        }else if(stringRole.equals(String.valueOf(ERole.ROLE_TRAINER))){
+            Role trainerRole = roleRepository.findByRoleName(ERole.ROLE_TRAINER)
+                    .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINER + " DOESN'T EXIST!"));
+            roles.add(trainerRole);
+        }else{
+            throw new RuntimeException("Not allowed!");
+        }
+        return roles;
+    }
+
+
+    private Set<Role> checkRoles(String stringRole){
+
+        System.out.println("debug: 214 line in userserviceImpl" + stringRole);
+
         Set<Role> roles = new HashSet<>();
         if (stringRole == null) {
             Role defaultRole = roleRepository.findByRoleName(ERole.ROLE_TRAINEE)
@@ -226,6 +257,9 @@ public class UserServiceImpl implements UserService {
                             .orElseThrow(() -> new RoleNotFoundException(ERole.ROLE_TRAINEE + " DOESN'T EXIST!"));
                     roles.add(traineeRole);
                     break;
+                default:
+                    System.out.println("in default case");
+                    throw new RoleNotAllowedException("Assigned role are not allowed!");
             }
         }
         return roles;

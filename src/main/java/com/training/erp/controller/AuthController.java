@@ -2,13 +2,11 @@ package com.training.erp.controller;
 
 import com.training.erp.entity.users.User;
 import com.training.erp.entity.users.UserVerificationCenter;
+import com.training.erp.exception.InputDataException;
 import com.training.erp.exception.RoleNotFoundException;
 import com.training.erp.exception.UserNotFoundException;
 import com.training.erp.model.request.*;
-import com.training.erp.model.response.LoginResponse;
-import com.training.erp.model.response.MessageResponse;
-import com.training.erp.model.response.UserDetails;
-import com.training.erp.model.response.UserProfile;
+import com.training.erp.model.response.*;
 import com.training.erp.repository.UserVerificationCenterRepository;
 import com.training.erp.security.jwt.JwtUtil;
 import com.training.erp.service.UserService;
@@ -52,65 +50,61 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtil.generateToken(authentication);
+        String generatedJwtToken = jwtUtil.generateToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername(), userDetails.getEmail(), roles));
+        return ResponseEntity.ok(LoginResponse.builder()
+                .token(generatedJwtToken)
+                .username(userDetails.getUsername())
+                .email(userDetails.getEmail())
+                .roles(roles)
+                .build());
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@Valid @RequestBody RegisterRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<?> signUp(@Valid @RequestBody RegisterRequest request) {
 
         if (userService.existsByUsername(request.getUsername())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse(request.getUsername() + " ALREADY EXISTS!"));
+            throw new InputDataException("Username already exists");
         }
         if (userService.existsByEmail(request.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse(request.getEmail() + " IS ALREADY IN USE!"));
+            throw new InputDataException("Email already exists");
         }
-
         return new ResponseEntity<>(userService.save(request), HttpStatus.CREATED);
     }
 
     @PostMapping("/users")
-    public ResponseEntity<?> addUser(@Valid @RequestBody UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<?> addNewUser(@Valid @RequestBody UserAddRequest request) throws RoleNotFoundException, MessagingException, UnsupportedEncodingException {
         if (userService.existsByEmail(request.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse(request.getEmail() + " IS ALREADY IN USE!"));
+            throw new InputDataException("Email already exists");
         }
         userService.save(request);
-        return ResponseEntity.ok(new MessageResponse("USER ADD SUCCESSFUL!"));
+        return ResponseEntity.ok(new MessageResponse("User added successfully"));
     }
 
-    @PostMapping("/users/password-reset")
+    @PostMapping("/users/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest request, Principal principal) throws UserNotFoundException {
         User user = userService.findByUsername(principal.getName())
-                .orElseThrow(() -> new UserNotFoundException("USER NOT FOUND"));
+                .orElseThrow(() -> new UserNotFoundException("user not found"));
 
-        if (!encoder.matches(request.getOld_password(), user.getPassword())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("INCORRECT THE CURRENT PASSWORD!");
+        if (!encoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new InputDataException("Incorrect the old password");
         }
 
-        if (!request.getNew_password().equals(request.getConfirm_password())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("CONFIRM PASSWORD DOESN'T MATCH WITH THE NEW PASSWORD!");
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new InputDataException("New and confirm password are not matched");
         }
-        user.setPassword(encoder.encode(request.getNew_password()));
+        user.setPassword(encoder.encode(request.getNewPassword()));
         userService.resetPassword(user);
-        return ResponseEntity.ok("PASSWORD RESET SUCCESSFUL!");
+        return ResponseEntity.ok(new MessageResponse("Password reset success"));
     }
 
+    // todo: add password reset limit
+
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<UserInfo>> getUsers() {
         return ResponseEntity.ok(userService.getAllUser());
     }
 
