@@ -13,7 +13,7 @@ import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
 import com.training.erp.model.response.CourseDetailsResponse;
-import com.training.erp.model.response.CourseResponse;
+import com.training.erp.model.response.CourseInfo;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.repository.AssignmentRepository;
 import com.training.erp.repository.CourseRepository;
@@ -36,7 +36,7 @@ public class CourseServiceImpl implements CourseService {
     private final UserMapper userManager;
 
     @Override
-    public CourseResponse save(CourseCreateRequest request) {
+    public CourseInfo save(CourseCreateRequest request) {
         if (existsByCourse(request.getCourseName())) {
             throw new RuntimeException("ALREADY EXISTS!");
         }
@@ -51,7 +51,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseResponse update(CourseUpdateRequest request) {
+    public CourseInfo update(CourseUpdateRequest request) {
         Course course = getCourse(request.getId());
         course.setId(course.getId());
         course.setCourseName(request.getCourseName());
@@ -60,7 +60,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<CourseResponse> getCourses() {
+    public List<CourseInfo> getCourses() {
         return courseMapper.courseListToCourseResponseDtoList(courseRepository.findAll());
     }
 
@@ -72,7 +72,7 @@ public class CourseServiceImpl implements CourseService {
                 .id(course.getId())
                 .courseName(course.getCourseName())
                 .courseDescription(course.getCourseDescription())
-                .trainer(userManager.userToUserDetails(course.getTrainer()))
+                .trainer(userManager.userToUserInfo(course.getTrainer()))
                 .assignments(assignmentMapper.assignmentsToAssignmentsResponse(assignments))
                 .build();
     }

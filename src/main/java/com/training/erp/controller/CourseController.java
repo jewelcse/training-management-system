@@ -6,7 +6,7 @@ import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
 import com.training.erp.model.response.CourseDetailsResponse;
-import com.training.erp.model.response.CourseResponse;
+import com.training.erp.model.response.CourseInfo;
 import com.training.erp.model.response.MessageResponse;
 import com.training.erp.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +22,17 @@ public class CourseController {
     private final CourseService courseService;
 
     @PostMapping("/courses")
-    public ResponseEntity<CourseResponse> create(@RequestBody CourseCreateRequest request) {
+    public ResponseEntity<CourseInfo> create(@RequestBody CourseCreateRequest request) {
         return new ResponseEntity<>(courseService.save(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/courses")
-    public ResponseEntity<CourseResponse> update(@RequestBody CourseUpdateRequest request){
+    public ResponseEntity<CourseInfo> update(@RequestBody CourseUpdateRequest request){
         return new ResponseEntity<>(courseService.update(request), HttpStatus.OK);
     }
 
     @GetMapping("/courses")
-    public ResponseEntity<List<CourseResponse>> getCourses() {
+    public ResponseEntity<List<CourseInfo>> getCourses() {
         return ResponseEntity.ok(courseService.getCourses());
     }
 

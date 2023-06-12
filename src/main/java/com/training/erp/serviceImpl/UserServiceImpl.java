@@ -181,9 +181,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyAccount(String otp) {
+    public void verifyAccount(AccountVerificationRequest request) {
         UserVerificationCenter verification = userVerificationCenterRepository
-                .findByVerificationCode(otp);
+                .findByVerificationCode(request.getOtp());
         if (verification == null) {
             throw new UserAccountException("verification code not found");
         }

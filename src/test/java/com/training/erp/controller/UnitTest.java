@@ -41,10 +41,6 @@ class UnitTest {
     UserRepository userRepository;
 
     @MockBean
-    TrainerRepository trainerRepository;
-
-
-    @MockBean
     BatchRepository batchRepository;
 
     @MockBean
@@ -65,7 +61,7 @@ class UnitTest {
         request.setUsername("Sabujcse");
         request.setEmail("sabuj@gmail.com");
         request.setPassword("sabuj");
-        request.setRoles(new HashSet<>());
+        request.setRole(new HashSet<>());
         request.setEnabled(true);
         request.setNonLocked(true);
         userRepository.save(request);
@@ -80,7 +76,7 @@ class UnitTest {
         request.setUsername("admin");
         request.setEmail("admin@gmail.com");
         request.setPassword("admin");
-        request.setRoles(new HashSet<>());
+        request.setRole(new HashSet<>());
         request.setEnabled(true);
         request.setNonLocked(true);
 
@@ -94,33 +90,32 @@ class UnitTest {
     @Test
     public void getBatchListTest() {
         Timestamp times = null;
-        Set<Trainer> trainers = new HashSet<>();
-        Set<Trainee> trainees = new HashSet<>();
+
         Set<Course> courses = new HashSet<>();
-        List<Batch> batches = Arrays.asList(
-                new Batch(1L,"Java Batch","This is a java batch", null, null,trainees,trainers,courses),
-                new Batch(2L,"MERN Batch","This is a mern batch", null, null,trainees,trainers,courses),
-                new Batch(3L,"Android Batch","This is a android batch", null, null,trainees,trainers,courses)
-        );
-        when(batchRepository.findAll()).thenReturn(batches);
+//        List<Batch> batches = Arrays.asList(
+//                new Batch(1L,"Java Batch","This is a java batch", null, null,trainees,trainers,courses),
+//                new Batch(2L,"MERN Batch","This is a mern batch", null, null,trainees,trainers,courses),
+//                new Batch(3L,"Android Batch","This is a android batch", null, null,trainees,trainers,courses)
+//        );
+        //when(batchRepository.findAll()).thenReturn(batches);
         assertEquals(3, batchService.getAllBatch().size());
     }
 
 
     @Test
     public void getCourseListTest() {
-        Trainer trainer = new Trainer();
+
         List<Assignment> assignments = new ArrayList<>();
         Set<Batch> batches = new HashSet<>();
 
-        List<Course> courses = Arrays.asList(
-                new Course(1L,"Spring Boot Course","This is spring boot course",trainer,batches,assignments),
-                new Course(2L,"Spring Security","This is spring security course",trainer,batches,assignments),
-                new Course(3L,"CSS3","This is css3  course",trainer,batches,assignments),
-                new Course(4L,"React JS","This is react course",trainer,batches,assignments)
-
-        );
-        when(courseRepository.findAll()).thenReturn(courses);
+//        List<Course> courses = Arrays.asList(
+//                new Course(1L,"Spring Boot Course","This is spring boot course",trainer,batches,assignments),
+//                new Course(2L,"Spring Security","This is spring security course",trainer,batches,assignments),
+//                new Course(3L,"CSS3","This is css3  course",trainer,batches,assignments),
+//                new Course(4L,"React JS","This is react course",trainer,batches,assignments)
+//
+//        );
+        //when(courseRepository.findAll()).thenReturn(courses);
 
         assertEquals(4, courseService.getCourses().size());
     }

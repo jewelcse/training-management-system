@@ -44,7 +44,8 @@ public class User {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Profile profile;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "batch_id")
     private Batch batch;
 
 

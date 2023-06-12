@@ -23,7 +23,7 @@ public interface UserService {
     void activateDeactivateUserAccount(Long userId);
     boolean existsByUserId(long id);
     Optional<User> findById(long id);
-    void verifyAccount(String code);
+    void verifyAccount(AccountVerificationRequest request);
     void resetPassword(PasswordResetRequest request, Principal principal);
 
     UserDetails getUserDetails(long userId);

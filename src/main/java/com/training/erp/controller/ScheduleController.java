@@ -5,6 +5,7 @@ import com.training.erp.exception.BatchNotFoundException;
 import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.model.request.ScheduleRequest;
 import com.training.erp.service.ScheduleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class ScheduleController {
 
-    @Autowired
-    private ScheduleService scheduleService;
+    private final ScheduleService scheduleService;
 
     private static final SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

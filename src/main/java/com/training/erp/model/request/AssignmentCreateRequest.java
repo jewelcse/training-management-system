@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AssignmentCreateRequest {
     private String title;
     private double marks;

@@ -57,19 +57,17 @@ public class UserMapper {
 
     public UserInfo userToUserInfo(User user){
 
-        AtomicReference<String> batch = new AtomicReference<>("N/A");
-        Optional<Batch> userBatch = Optional.ofNullable(user.getBatch());
-        userBatch.ifPresent(obj -> {
-            batch.set(userBatch.get().getBatchName());
-        });
+//        AtomicReference<String> batch = new AtomicReference<>("N/A");
+//        Optional<Batch> userBatch = Optional.ofNullable(user.getBatch());
+//        userBatch.ifPresent(obj -> {
+//            batch.set(userBatch.get().getBatchName());
+//        });
 
         return UserInfo.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .isNonLocked(user.isNonLocked())
                 .isEnabled(user.isEnabled())
-                .batch(String.valueOf(batch))
-                .roles(user.getRole())
                 .build();
     }
 

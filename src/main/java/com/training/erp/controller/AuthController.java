@@ -102,9 +102,9 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("updated request"));
     }
 
-    @GetMapping("/verify/account")
-    public ResponseEntity<MessageResponse> verifyAccount(@RequestParam String code) {
-        userService.verifyAccount(code);
+    @PostMapping("/verify/account")
+    public ResponseEntity<MessageResponse> verifyAccount(@RequestParam AccountVerificationRequest request) {
+        userService.verifyAccount(request);
         return ResponseEntity.ok(new MessageResponse("account verified"));
     }
 

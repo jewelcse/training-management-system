@@ -4,7 +4,6 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +16,6 @@ public class BatchDetailsResponse {
     private String batchDescription;
     private Timestamp startDate;
     private Timestamp endDate;
-    private List<CourseResponse> course;
-    private Set<UserDetails> users;
+    private List<CourseInfo> courses;
+    private List<UserInfo> trainees;
 }
