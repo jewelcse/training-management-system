@@ -12,6 +12,7 @@ import javax.persistence.*;
 @ToString
 @Entity
 @Table(name = "student_submissions")
+@Builder
 public class AssignmentSubmission {
 
     @Id
