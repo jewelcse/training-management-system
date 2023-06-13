@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 uploads
+mvnw
+mvnw.cmd
+.mvn
 
 ### STS ###
 .apt_generated
