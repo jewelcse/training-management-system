@@ -14,6 +14,6 @@ public class CourseDetailsResponse {
     private long id;
     private String courseName;
     private String courseDescription;
-    private UserDetails trainer;
+    private UserInfo trainer;
     private List<AssignmentResponse> assignments;
 }

@@ -29,16 +29,25 @@ public class Batch {
     private Timestamp endDate;
 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {
-            CascadeType.PERSIST
-    })
-    Set<User> users= new HashSet<>();
+
+    @OneToMany(mappedBy = "batch",
+            cascade = CascadeType.PERSIST, orphanRemoval = true)
+    List<User> trainees= new ArrayList<>();
 
 
 
     @ManyToMany(fetch = FetchType.LAZY,cascade = {
             CascadeType.PERSIST
     })
+    @JoinTable(
+            name = "batches_courses",
+            joinColumns = @JoinColumn(
+                    name = "batch_id", referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "course_id", referencedColumnName = "id"
+            )
+    )
     List<Course> courses = new ArrayList<>();
 
 

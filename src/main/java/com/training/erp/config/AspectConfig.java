@@ -27,18 +27,17 @@ public class AspectConfig {
     }
 
     // called every time if any exceptions occurred in the service
-    @Around("execution(* com.training.erp.service.*.*(..))")
-    public Object aroundExecution(ProceedingJoinPoint joinPoint) throws Throwable {
-
-        try {
-            Object object = joinPoint.proceed();
-            return object;
-        }catch (Exception e) {
-            logger.info("Handling exception while executing{}");
-        }
-
-        return null;
-    }
+//    @Around("execution(* com.training.erp.service.*.*(..))")
+//    public Object aroundExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+//        Object object = null;
+//        try {
+//            object = joinPoint.proceed();
+//
+//        }catch (Exception e) {
+//            logger.info("Handling exception while executing{}");
+//        }
+//        return object;
+//    }
 
 
 }

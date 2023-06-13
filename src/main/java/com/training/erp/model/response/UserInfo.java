@@ -10,11 +10,9 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class UserDetails {
+public class UserInfo {
     private String username;
     private String email;
     private boolean isEnabled;
     private boolean isNonLocked;
-    private Set<Role> roles;
-    private String batch;
 }

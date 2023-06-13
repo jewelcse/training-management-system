@@ -5,19 +5,19 @@ import com.training.erp.model.request.CourseCreateRequest;
 import com.training.erp.model.request.CourseUpdateRequest;
 import com.training.erp.model.request.RemoveTrainerRequest;
 import com.training.erp.model.response.CourseDetailsResponse;
-import com.training.erp.model.response.CourseResponse;
+import com.training.erp.model.response.CourseInfo;
 import com.training.erp.model.response.MessageResponse;
 
 import java.util.List;
 
 public interface CourseService {
-    CourseResponse save(CourseCreateRequest request);
+    CourseInfo save(CourseCreateRequest request);
 
-    CourseResponse update(CourseUpdateRequest request);
+    CourseInfo update(CourseUpdateRequest request);
 
     boolean existsByCourse(String course_name);
 
-    List<CourseResponse> getCourses();
+    List<CourseInfo> getCourses();
 
     void deleteCourseById(long courseId);
 

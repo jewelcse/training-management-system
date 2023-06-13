@@ -35,6 +35,21 @@ public class ApplicationExceptionHandler {
     public ResponseEntity<JsonExceptionResponse> roleNotFoundException(RoleNotFoundException exception) {
         return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 404), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(value = RoleNotAllowedException.class)
+    public ResponseEntity<JsonExceptionResponse> roleNotAllowedException(RoleNotAllowedException exception) {
+        return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = UserAccountException.class)
+    public ResponseEntity<JsonExceptionResponse> userAccountException(UserAccountException exception) {
+        return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = InputDataException.class)
+    public ResponseEntity<JsonExceptionResponse> inputDataException(InputDataException exception) {
+        return new ResponseEntity<>(new JsonExceptionResponse(exception.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     @ExceptionHandler(value = TraineeNotFoundException.class)
     public ResponseEntity<JsonExceptionResponse> traineeNotFoundException(TraineeNotFoundException exception) {

@@ -14,6 +14,7 @@ import java.util.Date;
 @ToString
 @Entity
 @Table(name = "profiles")
+@Builder
 public class Profile {
 
     @Id

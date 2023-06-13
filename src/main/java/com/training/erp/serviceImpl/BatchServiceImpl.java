@@ -73,12 +73,11 @@ public class BatchServiceImpl implements BatchService {
     public MessageResponse assignUserToBatch(AddUserToBatchRequest request) throws BatchNotFoundException, UserNotFoundException {
         Batch batch = getBatch(request.getBatchId());
         User user = getUser(request.getUserId());
-        Set<User> users = batch.getUsers();
-        users.add(user);
-        batch.setUsers(users);
-        batchRepository.save(batch);
+
+        user.setBatch(batch);
+        userRepository.save(user);
         return MessageResponse.builder()
-                .message("SUCCESS!")
+                .message("assigned success!")
                 .build();
 
     }
@@ -87,12 +86,10 @@ public class BatchServiceImpl implements BatchService {
     public MessageResponse removeUserFromBatch(RemoveUserRequest request) {
         Batch batch = getBatch(request.getBatchId());
         User user = getUser(request.getUserId());
-        Set<User> users = batch.getUsers();
-        users.remove(user);
-        batch.setUsers(users);
-        batchRepository.save(batch);
+        user.setBatch(null);
+        userRepository.save(user);
         return MessageResponse.builder()
-                .message("SUCCESS!")
+                .message("remove batch!")
                 .build();
     }
 
@@ -126,16 +123,21 @@ public class BatchServiceImpl implements BatchService {
     @Override
     public BatchDetailsResponse getBatchById(long id) {
         Batch batch = getBatch(id);
-        List<Course> courses = batch.getCourses();
-        Set<User> users = batch.getUsers();
+
+        List<Course> courses = batch.getCourses().isEmpty() ? new ArrayList<>() :
+                batch.getCourses();
+
+        List<User> users = batch.getTrainees().isEmpty() ? new ArrayList<>() :
+                batch.getTrainees();
+
         return BatchDetailsResponse.builder()
                 .id(batch.getId())
                 .batchName(batch.getBatchName())
                 .batchDescription(batch.getBatchDescription())
                 .startDate(batch.getStartDate())
                 .endDate(batch.getEndDate())
-                .course(courseMapper.courseListToCourseResponseDtoList(courses))
-                .users(userManager.usersToUserDetailsList(users))
+                .courses(courseMapper.courseListToCourseResponseDtoList(courses))
+                .trainees(userManager.usersToUserInfoList(users))
                 .build();
     }
 
