@@ -94,9 +94,6 @@ $ cd training-management-system
 
 ```
 
-
-
-
 Made with :heart: by <a href="https://github.com/jewelcse" target="_blank">Jewel Chowdhury</a>
 
 &#xa0;
