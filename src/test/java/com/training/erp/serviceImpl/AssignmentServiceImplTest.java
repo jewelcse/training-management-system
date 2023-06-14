@@ -10,23 +10,20 @@ import com.training.erp.exception.CourseNotFoundException;
 import com.training.erp.mapper.AssignmentMapper;
 import com.training.erp.mapper.UserMapper;
 import com.training.erp.model.request.AssignmentCreateRequest;
-import com.training.erp.model.response.AssignmentResponse;
-import com.training.erp.model.response.AssignmentSubmissionResponse;
-import com.training.erp.model.response.UserProfile;
+import com.training.erp.model.request.AssignmentEvaluateRequest;
+import com.training.erp.model.response.*;
 import com.training.erp.repository.AssignmentRepository;
 import com.training.erp.repository.AssignmentSubmissionRepository;
 import com.training.erp.repository.CourseRepository;
 import com.training.erp.repository.UserRepository;
-import com.training.erp.service.AssignmentService;
 import com.training.erp.util.FilesStorageService;
-import lombok.AllArgsConstructor;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +49,7 @@ class AssignmentServiceImplTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
     private FilesStorageService filesStorageService;
 
     @InjectMocks
@@ -336,7 +334,7 @@ class AssignmentServiceImplTest {
     }
 
     @Test
-    void getSubmissionsByAssignmentId() {
+    void getSubmissionsByAssignmentId_validRequest_ShouldReturnAllSubmisstionsByAssignmentId() {
 
         // arrange
         long submissionId = 1L;
@@ -393,8 +391,8 @@ class AssignmentServiceImplTest {
                 .assignment(assignment)
                 .build();
 
-        List<AssignmentSubmission> assignmentSubmissions = List.of(assignmentSubmission,assignmentSubmission);
-        List<AssignmentSubmissionResponse> expectedResponse = List.of(assignmentSubmissionResponse,assignmentSubmissionResponse);
+        List<AssignmentSubmission> assignmentSubmissions = List.of(assignmentSubmission, assignmentSubmission);
+        List<AssignmentSubmissionResponse> expectedResponse = List.of(assignmentSubmissionResponse, assignmentSubmissionResponse);
 
 
         when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(assignment));
@@ -411,7 +409,7 @@ class AssignmentServiceImplTest {
     }
 
     @Test
-    void getSubmissionById() {
+    void getSubmissionById_ValidRequest_ShouldReturnSubmissionById() {
 
 
         // arrange
@@ -438,7 +436,6 @@ class AssignmentServiceImplTest {
                 .course(course)
                 .totalMarks(total)
                 .build();
-
 
 
         UserProfile userProfile = UserProfile
@@ -486,26 +483,141 @@ class AssignmentServiceImplTest {
         assertEquals(expectedResponse.getTotalMarks(), response.getTotalMarks());
         assertEquals(expectedResponse.getObtainedMarks(), response.getObtainedMarks());
 
+    }
 
+    @Test
+    void updateSubmission_ValidRequest_ShouldUpdateTheSubmissionMarks() {
+        //arrange
+        long submissionId = 1L;
+        long assignmentId = 1L;
+        int marks = 50;
+        int obtainMarks = 50;
+        String fileLocation = "c://java/cm.txt";
+        String assignmentTitle = "Assignment title";
+
+        AssignmentEvaluateRequest requestBody = AssignmentEvaluateRequest
+                .builder()
+                .submissionId(submissionId)
+                .marks(marks)
+                .build();
+
+        Assignment assignment = Assignment
+                .builder()
+                .id(assignmentId)
+                .fileLocation(fileLocation)
+                .title(assignmentTitle)
+                .course(new Course())
+                .totalMarks(marks)
+                .build();
+
+        AssignmentSubmission assignmentSubmission = AssignmentSubmission
+                .builder()
+                .id(submissionId)
+                .student(new User())
+                .fileLocation(fileLocation)
+                .obtainedMarks(obtainMarks)
+                .assignment(assignment)
+                .build();
+
+
+        UpdatedSubmissionResponse expectedResponse = UpdatedSubmissionResponse
+                .builder()
+                .submissionId(submissionId)
+                .obtainedMarks(obtainMarks)
+                .totalMarks(marks)
+                .build();
+
+        when(traineesAssignmentSubmissionRepository.findById(submissionId)).thenReturn(Optional.of(assignmentSubmission));
+        when(traineesAssignmentSubmissionRepository.save(assignmentSubmission)).thenReturn(assignmentSubmission);
+
+        // act
+        UpdatedSubmissionResponse response = assignmentService.updateSubmission(requestBody);
+
+        // assert
+
+        assertNotNull(response);
+        assertEquals(expectedResponse.getSubmissionId(), response.getSubmissionId());
+        assertEquals(expectedResponse.getObtainedMarks(), response.getObtainedMarks());
+        assertEquals(expectedResponse.getTotalMarks(), response.getTotalMarks());
 
 
     }
 
     @Test
-    void updateSubmission() {
+    void submitAssignment_ValidRequest_ShouldSubmitSubmission() {
+
+        // Arrange
+        long sid = 1;
+        long aid = 1;
+        String filePath = "c://java/files";
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "Hello, World!".getBytes());
+        User user = User.builder()
+                .id(sid)
+                .build();
+
+        Assignment assignment = Assignment.builder()
+                .id(aid)
+                .build();
+
+        AssignmentSubmission assignmentSubmission = AssignmentSubmission
+                .builder()
+                .id(aid)
+                .build();
 
 
-
-
-
+        when(userRepository.findById(sid)).thenReturn(Optional.of(user));
+        when(assignmentRepository.findById(aid)).thenReturn(Optional.of(assignment));
+        when(traineesAssignmentSubmissionRepository.existsByStudentAndAssignment(user,assignment))
+                .thenReturn(false);
+        when(filesStorageService.saveFile(file)).thenReturn(filePath);
+        when(traineesAssignmentSubmissionRepository.save(assignmentSubmission)).thenReturn(assignmentSubmission);
 
     }
 
     @Test
-    void submitAssignment() {
-    }
+    void getSubmissionsByStudent_ValidRequest_ShouldReturnListOfSubmissionsByStudent() {
 
-    @Test
-    void getSubmissionsByStudent() {
+        String username = "username";
+        String assignmentTitle = "assignment title";
+        String courseTitle = "course title";
+        long uid = 1L;
+        long asid = 1L;
+        User user = User
+                .builder()
+                .id(uid)
+                .username(username)
+                .build();
+
+        Course course = Course
+                .builder()
+                .courseName(courseTitle)
+                .build();
+
+        Assignment assignment = Assignment
+                .builder()
+                .title(assignmentTitle)
+                .course(course)
+                .build();
+
+        AssignmentSubmission assignmentSubmission = AssignmentSubmission
+                .builder()
+                .id(asid)
+                .student(user)
+                .assignment(assignment)
+                .build();
+
+        List<AssignmentSubmission> expectedResponse = List.of(assignmentSubmission,assignmentSubmission);
+
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(traineesAssignmentSubmissionRepository.findAllByStudent(user)).thenReturn(expectedResponse);
+
+        // act
+
+        List<SubmissionResponse> responses = assignmentService.getSubmissionsByStudent(username);
+
+        // arrange
+        assertEquals(expectedResponse.size(), responses.size());
+
+
     }
 }
