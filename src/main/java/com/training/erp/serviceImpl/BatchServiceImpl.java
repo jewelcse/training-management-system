@@ -27,7 +27,7 @@ public class BatchServiceImpl implements BatchService {
     private final CourseRepository courseRepository;
     private final BatchMapper batchMapper;
     private final CourseMapper courseMapper;
-    private final UserMapper userManager;
+    private final UserMapper userMapper;
 
     @Override
     public BatchCreateResponse save(BatchCreateRequest request) {
@@ -89,7 +89,7 @@ public class BatchServiceImpl implements BatchService {
         user.setBatch(null);
         userRepository.save(user);
         return MessageResponse.builder()
-                .message("remove batch!")
+                .message("remove user!")
                 .build();
     }
 
@@ -98,11 +98,14 @@ public class BatchServiceImpl implements BatchService {
         Batch batch = getBatch(request.getBatchId());
         Course course = getCourse(request.getCourseId());
         List<Course> courses = batch.getCourses();
+        if (courses.contains(course)){
+            throw new CourseNotFoundException("Already added the course");
+        }
         courses.add(course);
         batch.setCourses(courses);
         batchRepository.save(batch);
         return MessageResponse.builder()
-                .message("SUCCESS!")
+                .message("success!")
                 .build();
     }
 
@@ -137,7 +140,7 @@ public class BatchServiceImpl implements BatchService {
                 .startDate(batch.getStartDate())
                 .endDate(batch.getEndDate())
                 .courses(courseMapper.courseListToCourseResponseDtoList(courses))
-                .trainees(userManager.usersToUserInfoList(users))
+                .trainees(userMapper.usersToUserInfoList(users))
                 .build();
     }
 

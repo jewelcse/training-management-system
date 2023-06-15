@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AddUserToBatchRequest {
     private long batchId;
     private long userId;

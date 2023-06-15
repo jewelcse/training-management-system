@@ -18,6 +18,7 @@ import java.util.Set;
 @ToString
 @Entity
 @Table(name = "batches")
+@Builder
 public class Batch {
 
     @Id
