@@ -33,7 +33,7 @@ public class CourseServiceImpl implements CourseService {
     private final UserRepository userRepository;
     private final CourseMapper courseMapper;
     private final AssignmentMapper assignmentMapper;
-    private final UserMapper userManager;
+    private final UserMapper userMapper;
 
     @Override
     public CourseInfo save(CourseCreateRequest request) {
@@ -72,7 +72,7 @@ public class CourseServiceImpl implements CourseService {
                 .id(course.getId())
                 .courseName(course.getCourseName())
                 .courseDescription(course.getCourseDescription())
-                .trainer(userManager.userToUserInfo(course.getTrainer()))
+                .trainer(userMapper.userToUserInfo(course.getTrainer()))
                 .assignments(assignmentMapper.assignmentsToAssignmentsResponse(assignments))
                 .build();
     }
