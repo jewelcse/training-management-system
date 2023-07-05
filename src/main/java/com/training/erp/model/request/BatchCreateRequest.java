@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class BatchCreateRequest {
     private String batchName;
     private String batchDescription;
